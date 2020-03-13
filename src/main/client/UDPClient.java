@@ -52,7 +52,7 @@ public class UDPClient {
 
     public static void main(String args[]){
         UDPClient aClient = new UDPClient();
-        byte[] b = ("asdf").getBytes();
+        byte[] b = ("gaas").getBytes();
         System.out.println(aClient.send(b));
         aClient.close();
     }

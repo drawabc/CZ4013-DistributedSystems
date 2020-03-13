@@ -1,21 +1,26 @@
 package main.server;
+import javax.xml.crypto.Data;
 import java.net.*;
 import java.io.*;
 
 
 public class UDPServer {
     public boolean receiving;
+    public DatagramSocket socket;
     public UDPServer(){
+        try{
+            socket = new DatagramSocket(8899);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     public void run(){
         try{
             byte[] buffer = new byte[1000];
-            while(true){
-                DatagramSocket socket = null;
-                System.out.println("ASDF");
-                socket = new DatagramSocket(8899);
-                System.out.println("ASDU");
+            while(socket != null){
                 DatagramPacket request = new DatagramPacket(buffer, buffer.length);
                 // TODO: implement marshalling/un-marshalling
                 // TODO: timeout ack, etc
