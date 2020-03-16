@@ -1,7 +1,8 @@
 package main.client;
-import java.net.*;
-import java.io.*;
 
+import java.net.*;
+import java.util.Scanner;
+import java.io.*;
 
 public class UDPClient {
     private DatagramSocket socket;
@@ -10,39 +11,35 @@ public class UDPClient {
     private byte[] buf;
 
     public UDPClient() {
-        try{
+        try {
             socket = new DatagramSocket();
             address = InetAddress.getByName("localhost");
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    public void reconnect(){
-        try{
+    public void reconnect() {
+        try {
             socket = new DatagramSocket();
             address = InetAddress.getByName("localhost");
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public String send(byte[] buf) {
-        DatagramPacket packet
-                = new DatagramPacket(buf, buf.length, address, 8899);
-        System.out.println("111213");
-        try{
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 8899);
+        try {
             socket.send(packet);
-            System.out.println("1112133");
             packet = new DatagramPacket(buf, buf.length);
             socket.receive(packet);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        String received = new String(
-                packet.getData(), 0, packet.getLength());
+        String received = new String(packet.getData(), 0, packet.getLength());
         return received;
     }
 
@@ -50,10 +47,25 @@ public class UDPClient {
         socket.close();
     }
 
-    public static void main(String args[]){
+    public static void main(String args[]) {
         UDPClient aClient = new UDPClient();
-        byte[] b = ("gaas").getBytes();
+        Scanner sc = new Scanner(System.in);
+        byte[] b = null;
+
+        System.out.println("(1) Read file\t(2) Insert to file");
+
+        int choice = Integer.parseInt(sc.nextLine());
+        if (choice == 1) {
+            b = ReadFile.promptUser(sc);
+        } else if (choice == 2) {
+            b = InsertToFile.promptUser(sc);
+        } else {
+            System.out.println("Wrong choice");
+            System.exit(1);
+        }
+
         System.out.println(aClient.send(b));
+
         aClient.close();
     }
 
