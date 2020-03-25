@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class ReadFile {
     // Parameters: file pathname, offset (bytes), # of bytes to read
-    public static byte[] promptUser(Scanner sc) {
+    public static byte[] promptUser(Scanner sc, int id) {
         System.out.println("Enter file pathname:");
         String filePath = sc.nextLine();
 
@@ -15,12 +15,13 @@ public class ReadFile {
         System.out.println("How many characters you want to read:");
         int numBytes = Integer.parseInt(sc.nextLine());
 
-        return constructRequest(filePath, offset, numBytes);
+        return constructRequest(id, filePath, offset, numBytes);
     }
 
-    public static byte[] constructRequest(String filePath, int offset, int numBytes) {
+    public static byte[] constructRequest(int id, String filePath, int offset, int numBytes) {
         ArrayList<Byte> request = new ArrayList<Byte>();
 
+        Utils.appendMsg(request, id);
         Utils.appendMsg(request, 1); // Type of service ID
         Utils.appendMsgHeader(request, filePath);
         Utils.appendMsgHeader(request, offset);
@@ -29,24 +30,25 @@ public class ReadFile {
         return Utils.unwrapList(request);
     }
 
-    public static void deconstructRequest(byte[] message) {
-        System.out.println(message + " " + message.length);
-
+    public static void handleResponse(byte[] response) {
         int pointer = 0;
-        int length = Utils.unmarshal(message, pointer);
-        pointer += 4;
-        String filePath = Utils.unmarshal(message, pointer, pointer + length);
-        pointer += length;
+        String status = Utils.unmarshal(response, pointer, 1);
+        pointer++;
 
-        length = Utils.unmarshal(message, pointer);
-        pointer += 4;
-        int offset = Utils.unmarshal(message, pointer);
-        pointer += length;
-
-        length = Utils.unmarshal(message, pointer);
-        pointer += 4;
-        int numBytes = Utils.unmarshal(message, pointer);
-
-        System.out.println(String.format("%s %d %d", filePath, offset, numBytes));
+        if (status.equals("1")) {
+            int length = Utils.unmarshal(response, pointer);
+            pointer += 4;
+            String message = Utils.unmarshal(response, pointer, pointer + length);
+            pointer += length;
+            System.out.println(message);
+        } else if (status.equals("0")) {
+            int length = Utils.unmarshal(response, pointer);
+            pointer += 4;
+            String message = Utils.unmarshal(response, pointer, pointer + length);
+            pointer += length;
+            System.out.println(message);
+        } else {
+            System.out.println("Error: failed to parse response");
+        }
     }
 }

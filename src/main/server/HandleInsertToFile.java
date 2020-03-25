@@ -3,11 +3,13 @@ package main.server;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.InetAddress;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 
 public class HandleInsertToFile {
-    public static byte[] handleRequest(byte[] message) {
+    public static void handleRequest(UDPServer server, byte[] message, InetAddress address, int port) {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
         pointer += 4;
@@ -23,20 +25,23 @@ public class HandleInsertToFile {
         pointer += 4;
         String content = Utils.unmarshal(message, pointer, pointer + length);
 
-        System.out.println(String.format("%s %d %s", filePath, offset, content));
+        System.out.println(String.format("Insert to file: %s %d %s", filePath, offset, content));
 
-        // TODO: implement response message
         try {
-            return insertToFile(filePath, offset, content);
+            byte[] response = createACK(server.getID(), "1", insertToFile(filePath, offset, content));
+            server.send(response, 2, address, port);
+            String notification = address.toString() + ":" + port + " editted " + filePath;
+            HandleMonitor.notify(server, filePath, notification);
         } catch (IOException e) {
             System.out.println(e);
             String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
-            return errorMsg.getBytes();
+            byte[] response = createACK(server.getID(), "0", errorMsg);
+            server.send(response, 2, address, port);
         }
 
     }
 
-    public static byte[] insertToFile(String filePath, int offset, String content) throws IOException {
+    public static String insertToFile(String filePath, int offset, String content) throws IOException {
         // Read file
         RandomAccessFile aFile = new RandomAccessFile(filePath, "r");
         FileChannel inChannel = aFile.getChannel();
@@ -73,6 +78,16 @@ public class HandleInsertToFile {
         outputStream.write(afterOffset);
         outputStream.close();
 
-        return "Successfully inserted to file".getBytes();
+        return "Successfully inserted to file " + filePath;
+    }
+
+    public static byte[] createACK(int id, String status, String message) {
+        ArrayList<Byte> response = new ArrayList<Byte>();
+
+        Utils.appendMsg(response, id);
+        Utils.appendMsg(response, status);
+        Utils.appendMsgHeader(response, message);
+
+        return Utils.unwrapList(response);
     }
 }

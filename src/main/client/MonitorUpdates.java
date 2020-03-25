@@ -1,31 +1,33 @@
 package main.client;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class InsertToFile {
-    // Parameters: file pathname, offset (bytes), content to insert
+public class MonitorUpdates {
+    private static long intervalLong;
+    private static Clock clock = Clock.systemDefaultZone();
+    private static long startTime;
+
+    // Parameters: file pathname, monitor interval
     public static byte[] promptUser(Scanner sc, int id) {
         System.out.println("Enter file pathname:");
         String filePath = sc.nextLine();
 
-        System.out.println("Enter character offset:");
-        int offset = Integer.parseInt(sc.nextLine());
+        System.out.println("Enter monitor interval (in ms):");
+        int interval = Integer.parseInt(sc.nextLine());
+        intervalLong = interval;
 
-        System.out.println("Enter content to be inserted:");
-        String content = sc.nextLine();
-
-        return constructRequest(id, filePath, offset, content);
+        return constructRequest(id, filePath, interval);
     }
 
-    public static byte[] constructRequest(int id, String filePath, int offset, String content) {
+    public static byte[] constructRequest(int id, String filePath, int interval) {
         ArrayList<Byte> request = new ArrayList<Byte>();
 
         Utils.appendMsg(request, id);
-        Utils.appendMsg(request, 2); // Type of service ID
+        Utils.appendMsg(request, 3); // Type of service ID
         Utils.appendMsgHeader(request, filePath);
-        Utils.appendMsgHeader(request, offset);
-        Utils.appendMsgHeader(request, content);
+        Utils.appendMsgHeader(request, interval);
 
         return Utils.unwrapList(request);
     }
@@ -41,6 +43,8 @@ public class InsertToFile {
             String message = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
             System.out.println(message);
+
+            startTime = clock.millis();
         } else if (status.equals("0")) {
             int length = Utils.unmarshal(response, pointer);
             pointer += 4;
@@ -50,5 +54,9 @@ public class InsertToFile {
         } else {
             System.out.println("Error: failed to parse response");
         }
+    }
+
+    public static boolean isMonitoring() {
+        return (clock.millis() - startTime) < intervalLong;
     }
 }

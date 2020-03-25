@@ -2,11 +2,13 @@ package main.server;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.InetAddress;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 
 public class HandleReadFile {
-    public static byte[] handleRequest(byte[] message) {
+    public static void handleRequest(UDPServer server, byte[] message, InetAddress address, int port) {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
         pointer += 4;
@@ -22,19 +24,22 @@ public class HandleReadFile {
         pointer += 4;
         int numBytes = Utils.unmarshal(message, pointer);
 
-        System.out.println(String.format("%s %d %d", filePath, offset, numBytes));
+        System.out.println(String.format("Read file: %s %d %d", filePath, offset, numBytes));
 
-        // TODO: implement response message
         try {
-            return readFile(filePath, offset, numBytes);
+            byte[] response = createACK(server.getID(), "1", readFile(filePath, offset, numBytes));
+            server.send(response, 1, address, port);
+            String notification = address.toString() + ":" + port + " read " + filePath;
+            HandleMonitor.notify(server, filePath, notification);
         } catch (IOException e) {
             System.out.println(e);
             String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
-            return errorMsg.getBytes();
+            byte[] response = createACK(server.getID(), "0", errorMsg);
+            server.send(response, 1, address, port);
         }
     }
 
-    public static byte[] readFile(String filePath, int offset, int numBytes) throws IOException {
+    public static String readFile(String filePath, int offset, int numBytes) throws IOException {
         RandomAccessFile aFile = new RandomAccessFile(filePath, "r");
         FileChannel inChannel = aFile.getChannel();
         MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, offset,
@@ -47,6 +52,16 @@ public class HandleReadFile {
         inChannel.close();
         aFile.close();
 
-        return b;
+        return new String(b);
+    }
+
+    public static byte[] createACK(int id, String status, String message) {
+        ArrayList<Byte> response = new ArrayList<Byte>();
+
+        Utils.appendMsg(response, id);
+        Utils.appendMsg(response, status);
+        Utils.appendMsgHeader(response, message);
+
+        return Utils.unwrapList(response);
     }
 }
