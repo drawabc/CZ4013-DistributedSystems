@@ -7,9 +7,11 @@ public class UDPClient {
     private DatagramSocket socket;
     private InetAddress address;
     private int reqID;
+    public int semInv;
 
     public UDPClient() {
         this.reqID = 0;
+        this.semInv = Constants.DEFAULT_SEMANTIC_INVOCATION;
         try {
             socket = new DatagramSocket();
             address = InetAddress.getByName("localhost");
@@ -17,6 +19,15 @@ public class UDPClient {
             e.printStackTrace();
         }
 
+    }
+
+    public int getSemInv(){
+        return this.semInv;
+    }
+
+    public int changeSemInv(){
+        this.semInv = this.semInv + 1 % 2;
+        return this.semInv;
     }
 
     public void reconnect() {
@@ -44,6 +55,7 @@ public class UDPClient {
             buf = new byte[bufsize];
 
             // Receive packet content
+            //TODO: semantic invocation
             packet = new DatagramPacket(buf, buf.length);
             socket.receive(packet);
 
