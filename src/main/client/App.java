@@ -1,5 +1,6 @@
 package main.client;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class App {
@@ -22,20 +23,25 @@ public class App {
                     break;
                 case 1:
                     b = ReadFile.promptUser(sc, udpclient.getID());
-                    response = udpclient.send(b);
+                    response = udpclient.requestReply(b);
                     ReadFile.handleResponse(response);
                     break;
                 case 2:
                     b = InsertToFile.promptUser(sc, udpclient.getID());
-                    response = udpclient.send(b);
+                    response = udpclient.requestReply(b);
                     InsertToFile.handleResponse(response);
                     break;
                 case 3:
                     b = MonitorUpdates.promptUser(sc, udpclient.getID());
-                    response = udpclient.send(b);
+                    response = udpclient.requestReply(b);
                     MonitorUpdates.handleResponse(response);
                     while (MonitorUpdates.isMonitoring()) { // TODO: implement proper timeout
-                        MonitorUpdates.handleResponse(udpclient.receive());
+                        // TODO: fix mechanism (receive no longer in try catch block)
+                        try{
+                            MonitorUpdates.handleResponse(udpclient.receive());
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 default:
                     System.out.println("Wrong choice");

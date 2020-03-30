@@ -6,7 +6,7 @@ public class Constants {
     public static final double FAIL_RATE = 0.0;
     public static final int AT_LEAST_ONCE = 0;
     public static final int AT_MOST_ONCE = 1;
-    public static final int DEFAULT_SEMANTIC_INVOCATION = AT_MOST_ONCE;
+    public static final int DEFAULT_SEMANTIC_INVOCATION = AT_LEAST_ONCE;
     public static final int DEFAULT_TIMEOUT = 2000;
 
 }
