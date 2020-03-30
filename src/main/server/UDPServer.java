@@ -39,6 +39,5 @@ public class UDPServer {
     public static void main(String args[]){
         UDPServer aServer = new UDPServer();
         aServer.run();
-
     }
 }
