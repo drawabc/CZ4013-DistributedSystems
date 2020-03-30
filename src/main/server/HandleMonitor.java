@@ -1,5 +1,6 @@
 package main.server;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.time.Clock;
 import java.util.ArrayList;
@@ -31,16 +32,15 @@ public class HandleMonitor {
 
         System.out.println(String.format("%s %d", filePath, interval));
 
-        Watcher watcher = new Watcher(address, port, clock.millis(), interval);
+        if (new File(filePath).isFile()) {
+            Watcher watcher = new Watcher(address, port, clock.millis(), interval);
+            addWatcher(watcher, filePath);
+            System.out.println("Added " + filePath + " watcher: " + address + ":" + port);
 
-        addWatcher(watcher, filePath);
-
-        try {
             byte[] response = createACK(server.getID(), "1", String.valueOf(watcher.getRemainingDuration()));
             server.send(response, 3, address, port);
-        } catch (Exception e) {
-            System.out.println(e);
-            String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
+        } else {
+            String errorMsg = "An error occured. Cannot find file " + filePath + ".";
             byte[] response = createACK(server.getID(), "0", errorMsg);
             server.send(response, 3, address, port);
         }

@@ -1,6 +1,10 @@
 package main.client;
 
 import java.io.IOException;
+
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+
 import java.util.Scanner;
 
 public class App {
@@ -33,16 +37,33 @@ public class App {
                     break;
                 case 3:
                     b = MonitorUpdates.promptUser(sc, udpclient.getID());
-                    response = udpclient.requestReply(b);
-                    MonitorUpdates.handleResponse(response);
-                    while (MonitorUpdates.isMonitoring()) { // TODO: implement proper timeout
-                        // TODO: fix mechanism (receive no longer in try catch block)
-                        try{
-                            MonitorUpdates.handleResponse(udpclient.receive());
-                        } catch (Exception e){
-                            e.printStackTrace();
+                    try {
+                        // TODO: debug udpclient.send(b) Exceptions
+                        // TODO: check for receive, both send and receive no longer in try catch
+                        response = udpclient.send(b);
+                        Long duration = MonitorUpdates.getDuration(response);
+                        System.out.println("Monitoring for " + duration / 1000 + " s");
+                        udpclient.setTimeout(duration.intValue());
+                        while (true) {
+                            try {
+                                MonitorUpdates.handleResponse(udpclient.receive());
+                            } catch (SocketTimeoutException e) {
+                                System.out.println("Timeout reached.");
+                                udpclient.setTimeout(0);
+                                break;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
+                    } catch (Exception e) {
+                        System.out.println("");
+                        e.printStackTrace();
                     }
+
+                    break;
+                // while (MonitorUpdates.isMonitoring()) { // TODO: implement proper timeout
+                // MonitorUpdates.handleResponse(udpclient.receive());
+                // }
                 default:
                     System.out.println("Wrong choice");
                     break;

@@ -24,13 +24,17 @@ public class UDPClient {
 
     }
 
-    public int getSemInv(){
+    public int getSemInv() {
         return this.semInv;
     }
 
-    public int changeSemInv(){
+    public int changeSemInv() {
         this.semInv = this.semInv + 1 % 2;
         return this.semInv;
+    }
+
+    public void setTimeout(int timeout) throws SocketException {
+        socket.setSoTimeout(timeout);
     }
 
     public void reconnect() {
@@ -58,7 +62,7 @@ public class UDPClient {
 
     }
 
-    public byte[] receive() throws IOException, InterruptedException {
+    public byte[] receive() throws SocketTimeoutException, IOException {
         // Receive packet header & adjust buffer
         byte[] buf = new byte[4];
         DatagramPacket packet = new DatagramPacket(buf, 4);
@@ -78,7 +82,7 @@ public class UDPClient {
     /*
         Send and receive, with all settings
     */
-    public byte[] requestReply(byte[] buf){
+    public byte[] requestReply(byte[] buf) {
         byte[] reply = new byte[0];
         int timeoutCount = 0;
         do {
@@ -89,7 +93,7 @@ public class UDPClient {
             } catch (SocketTimeoutException e) {
                 System.out.println("No Response, Re-send Request");
                 timeoutCount++;
-                if (timeoutCount == 5){
+                if (timeoutCount == 5) {
                     System.out.println("Request Failed");
                     break;
                 }
@@ -97,10 +101,9 @@ public class UDPClient {
                 e.printStackTrace();
                 break;
             }
-        } while(this.semInv == Constants.AT_LEAST_ONCE);
+        } while (this.semInv == Constants.AT_LEAST_ONCE);
         return reply;
     }
-
     public void close() {
         socket.close();
     }
