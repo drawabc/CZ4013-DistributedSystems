@@ -8,6 +8,7 @@ public class UDPClient {
     private InetAddress address;
     private int reqID;
     public int semInv;
+    public int socketTimeout;
 
     public UDPClient() {
         this.reqID = 0;
@@ -15,6 +16,7 @@ public class UDPClient {
         try {
             socket = new DatagramSocket();
             address = InetAddress.getByName("localhost");
+            socket.setSoTimeout(Constants.DEFAULT_TIMEOUT);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -34,6 +36,7 @@ public class UDPClient {
         try {
             socket = new DatagramSocket();
             address = InetAddress.getByName("localhost");
+            socket.setSoTimeout(Constants.DEFAULT_TIMEOUT);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -44,22 +47,12 @@ public class UDPClient {
         DatagramPacket packet = new DatagramPacket(header, header.length, address, 8899);
 
         try {
+            // Send packet header
             socket.send(packet);
+
+            // send body/content
             packet = new DatagramPacket(buf, buf.length, address, 8899);
             socket.send(packet);
-
-            // Receive packet header & adjust buffer
-            packet = new DatagramPacket(buf, 4);
-            socket.receive(packet);
-            int bufsize = Utils.unmarshal(packet.getData(), 0);
-            buf = new byte[bufsize];
-
-            // Receive packet content
-            //TODO: semantic invocation
-            packet = new DatagramPacket(buf, buf.length);
-            socket.receive(packet);
-
-            int reqID = Utils.unmarshal(packet.getData(), 0);
 
             return Arrays.copyOfRange(packet.getData(), 4, packet.getData().length);
 
@@ -91,6 +84,21 @@ public class UDPClient {
         }
 
         return new byte[0];
+    }
+
+    /*
+        Combine send and receive
+    */
+    public byte[] requestReply(byte[] buf){
+        byte[] reply = new byte[0];
+        try {
+            this.send(buf);
+            reply = this.receive();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return reply;
     }
 
     public void close() {
