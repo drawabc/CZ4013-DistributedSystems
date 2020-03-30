@@ -1,5 +1,7 @@
 package main.client;
 
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Scanner;
 
 public class App {
@@ -33,10 +35,30 @@ public class App {
                 case 3:
                     b = MonitorUpdates.promptUser(sc, udpclient.getID());
                     response = udpclient.send(b);
-                    MonitorUpdates.handleResponse(response);
-                    while (MonitorUpdates.isMonitoring()) { // TODO: implement proper timeout
-                        MonitorUpdates.handleResponse(udpclient.receive());
+                    Long duration = MonitorUpdates.getDuration(response);
+                    System.out.println("Monitoring for " + duration / 1000 + " s");
+
+                    try {
+                        udpclient.setTimeout(duration.intValue());
+                        while (true) {
+                            try {
+                                MonitorUpdates.handleResponse(udpclient.receive());
+                            } catch (SocketTimeoutException e) {
+                                System.out.println("Timeout reached.");
+                                udpclient.setTimeout(0);
+                                break;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } catch (SocketException e) {
+                        System.out.println("");
                     }
+
+                    break;
+                // while (MonitorUpdates.isMonitoring()) { // TODO: implement proper timeout
+                // MonitorUpdates.handleResponse(udpclient.receive());
+                // }
                 default:
                     System.out.println("Wrong choice");
                     break;

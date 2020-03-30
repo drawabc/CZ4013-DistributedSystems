@@ -1,22 +1,16 @@
 package main.client;
 
-import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MonitorUpdates {
-    private static long intervalLong;
-    private static Clock clock = Clock.systemDefaultZone();
-    private static long startTime;
-
     // Parameters: file pathname, monitor interval
     public static byte[] promptUser(Scanner sc, int id) {
         System.out.println("Enter file pathname:");
         String filePath = sc.nextLine();
 
-        System.out.println("Enter monitor interval (in ms):");
-        int interval = Integer.parseInt(sc.nextLine());
-        intervalLong = interval;
+        System.out.println("Enter monitor interval (in s):");
+        int interval = Integer.parseInt(sc.nextLine()) * 1000;
 
         return constructRequest(id, filePath, interval);
     }
@@ -32,6 +26,31 @@ public class MonitorUpdates {
         return Utils.unwrapList(request);
     }
 
+    public static long getDuration(byte[] response) {
+        int pointer = 0;
+        String status = Utils.unmarshal(response, pointer, 1);
+        pointer++;
+
+        if (status.equals("1")) {
+            int length = Utils.unmarshal(response, pointer);
+            pointer += 4;
+            String message = Utils.unmarshal(response, pointer, pointer + length);
+            pointer += length;
+
+            return Long.valueOf(message);
+        } else if (status.equals("0")) {
+            int length = Utils.unmarshal(response, pointer);
+            pointer += 4;
+            String message = Utils.unmarshal(response, pointer, pointer + length);
+            pointer += length;
+            System.out.println(message);
+            return 0;
+        } else {
+            System.out.println("Error: failed to parse response");
+            return 0;
+        }
+    }
+
     public static void handleResponse(byte[] response) {
         int pointer = 0;
         String status = Utils.unmarshal(response, pointer, 1);
@@ -44,7 +63,6 @@ public class MonitorUpdates {
             pointer += length;
             System.out.println(message);
 
-            startTime = clock.millis();
         } else if (status.equals("0")) {
             int length = Utils.unmarshal(response, pointer);
             pointer += 4;
@@ -54,9 +72,5 @@ public class MonitorUpdates {
         } else {
             System.out.println("Error: failed to parse response");
         }
-    }
-
-    public static boolean isMonitoring() {
-        return (clock.millis() - startTime) < intervalLong;
     }
 }

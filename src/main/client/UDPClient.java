@@ -1,5 +1,6 @@
 package main.client;
 
+import java.io.IOException;
 import java.net.*;
 import java.util.Arrays;
 
@@ -23,13 +24,17 @@ public class UDPClient {
 
     }
 
-    public int getSemInv(){
+    public int getSemInv() {
         return this.semInv;
     }
 
-    public int changeSemInv(){
+    public int changeSemInv() {
         this.semInv = this.semInv + 1 % 2;
         return this.semInv;
+    }
+
+    public void setTimeout(int timeout) throws SocketException {
+        socket.setSoTimeout(timeout);
     }
 
     public void reconnect() {
@@ -63,39 +68,32 @@ public class UDPClient {
 
     }
 
-    public byte[] receive() {
-        try {
-            // Receive packet header & adjust buffer
-            byte[] buf = new byte[4];
-            DatagramPacket packet = new DatagramPacket(buf, 4);
-            socket.receive(packet);
-            int bufsize = Utils.unmarshal(packet.getData(), 0);
-            buf = new byte[bufsize];
+    public byte[] receive() throws SocketTimeoutException, IOException {
+        // Receive packet header & adjust buffer
+        byte[] buf = new byte[4];
+        DatagramPacket packet = new DatagramPacket(buf, 4);
+        socket.receive(packet);
+        int bufsize = Utils.unmarshal(packet.getData(), 0);
+        buf = new byte[bufsize];
 
-            // Receive packet content
-            packet = new DatagramPacket(buf, buf.length);
-            socket.receive(packet);
+        // Receive packet content
+        packet = new DatagramPacket(buf, buf.length);
+        socket.receive(packet);
 
-            int reqID = Utils.unmarshal(packet.getData(), 0);
+        int reqID = Utils.unmarshal(packet.getData(), 0);
 
-            return Arrays.copyOfRange(packet.getData(), 4, packet.getData().length);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return new byte[0];
+        return Arrays.copyOfRange(packet.getData(), 4, packet.getData().length);
     }
 
     /*
-        Combine send and receive
-    */
-    public byte[] requestReply(byte[] buf){
+     * Combine send and receive
+     */
+    public byte[] requestReply(byte[] buf) {
         byte[] reply = new byte[0];
         try {
             this.send(buf);
             reply = this.receive();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return reply;
