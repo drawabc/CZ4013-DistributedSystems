@@ -1,5 +1,7 @@
 package main.server;
 
+import main.client.Constants;
+
 import java.net.*;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,6 +11,7 @@ public class UDPServer {
     public DatagramSocket socket;
     private HashMap<String, byte[]> clientHistory;
     private int resID;
+    public int semInv;
 
     public UDPServer() {
         resID = 0;
@@ -18,7 +21,7 @@ public class UDPServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        this.semInv = Constants.DEFAULT_SEMANTIC_INVOCATION;
     }
 
     public int getID() {
@@ -36,7 +39,7 @@ public class UDPServer {
             System.out.println("Error occured on handling client request");
         }
     }
-
+    // TODO: replace History
     public byte[] checkHistory(String address, int requestID) {
         String hashKey = address + "|" + requestID;
         return clientHistory.get(hashKey);
@@ -79,13 +82,15 @@ public class UDPServer {
                 System.out.println("Got request from " + fullAddress + " with ID: " + requestID);
 
                 byte[] response = checkHistory(fullAddress, requestID);
-                if (response == null) {
+                if(response != null && this.semInv == Constants.AT_MOST_ONCE){
+                    int serviceID = Utils.unmarshal(request.getData(), 4);
+                    byte[] requestContent = response;
+                    this.send(response, serviceID,  request.getAddress(), request.getPort());
+                }
+                else {
                     int serviceID = Utils.unmarshal(request.getData(), 4);
                     byte[] requestContent = Arrays.copyOfRange(request.getData(), 8, request.getData().length);
                     handleClientRequest(serviceID, requestContent, request.getAddress(), request.getPort());
-                    // response = handleClientRequest(serviceID, requestContent,
-                    // request.getAddress(), request.getPort());
-                    // updateHistory(fullAddress, requestID, response);
                 }
 
                 // DatagramPacket reply = new DatagramPacket(response, response.length,

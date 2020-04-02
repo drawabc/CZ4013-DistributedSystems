@@ -40,6 +40,8 @@ public class HandleReadFile {
     }
 
     public static String readFile(String filePath, int offset, int numBytes) throws IOException {
+        // TODO: CHECK ALL TEST CASES
+        filePath = "src/main/server/data/" + filePath;
         RandomAccessFile aFile = new RandomAccessFile(filePath, "r");
         FileChannel inChannel = aFile.getChannel();
         MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, offset,

@@ -9,7 +9,6 @@ public class UDPClient {
     private InetAddress address;
     private int reqID;
     public int semInv;
-    public int socketTimeout;
 
     public UDPClient() {
         this.reqID = 0;
@@ -101,7 +100,7 @@ public class UDPClient {
                 e.printStackTrace();
                 break;
             }
-        } while (this.semInv == Constants.AT_LEAST_ONCE);
+        } while (this.semInv == Constants.AT_LEAST_ONCE || this.semInv == Constants.AT_MOST_ONCE);
         return reply;
     }
     public void close() {

@@ -8,15 +8,17 @@ import main.server.HandleReadFile;
 public class TestFileHandling {
     public static void main(String[] args) {
         try {
-            System.out.println(new String(HandleReadFile.readFile("/home/nydia/Documents/CZ4013/tes.txt", 0, 1000)));
-        } catch (IOException e) {
+            System.out.println(new String(HandleReadFile.readFile( "data.txt", 0, 1000)));
+        } catch (Exception e) {
             System.out.print(e);
         }
-
+        // TODO: change file path to src/main/server/data + filePath in all functions
+        /*
         try {
-            HandleInsertToFile.insertToFile("/home/nydia/Documents/CZ4013/tespendek.txt", 1, "tes");
-        } catch (IOException e) {
+            HandleInsertToFile.insertToFile("data/data.txt", 1, "tes");
+        } catch (Exception e) {
             e.printStackTrace();
         }
+         */
     }
 }

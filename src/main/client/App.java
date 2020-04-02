@@ -38,18 +38,17 @@ public class App {
                 case 3:
                     b = MonitorUpdates.promptUser(sc, udpclient.getID());
                     try {
-                        // TODO: debug udpclient.send(b) Exceptions
-                        // TODO: check for receive, both send and receive no longer in try catch
-                        response = udpclient.send(b);
+                        response = udpclient.requestReply(b);
                         Long duration = MonitorUpdates.getDuration(response);
                         System.out.println("Monitoring for " + duration / 1000 + " s");
                         udpclient.setTimeout(duration.intValue());
+                        //TODO: fix or add timer (?)
                         while (true) {
                             try {
                                 MonitorUpdates.handleResponse(udpclient.receive());
                             } catch (SocketTimeoutException e) {
                                 System.out.println("Timeout reached.");
-                                udpclient.setTimeout(0);
+                                udpclient.setTimeout(Constants.DEFAULT_TIMEOUT);
                                 break;
                             } catch (Exception e) {
                                 e.printStackTrace();
