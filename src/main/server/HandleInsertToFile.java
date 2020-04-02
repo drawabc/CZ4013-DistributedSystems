@@ -1,5 +1,8 @@
 package main.server;
 
+import main.client.Constants;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -31,7 +34,7 @@ public class HandleInsertToFile {
             byte[] response = createACK(server.getID(), "1", insertToFile(filePath, offset, content));
             server.send(response, 2, address, port);
             String notification = address.toString() + ":" + port + " editted " + filePath;
-            HandleMonitor.notify(server, filePath, notification);
+            HandleMonitor.notify(server, Constants.FILEPATH + filePath, notification);
         } catch (IOException e) {
             System.out.println(e);
             String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
@@ -43,19 +46,19 @@ public class HandleInsertToFile {
 
     public static String insertToFile(String filePath, int offset, String content) throws IOException {
         // Read file
-        RandomAccessFile aFile = new RandomAccessFile(filePath, "r");
-        FileChannel inChannel = aFile.getChannel();
-        MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
 
+        filePath =  filePath;
+        RandomAccessFile aFile = new RandomAccessFile(filePath, "rw");
+        FileChannel inChannel = aFile.getChannel();
+        MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_WRITE, 0, inChannel.size());
         byte[] beforeOffset = new byte[offset];
         buffer.get(beforeOffset, 0, offset);
 
         byte[] afterOffset = new byte[buffer.remaining()];
         buffer.get(afterOffset);
 
-        buffer.clear(); // do something with the data and clear/compact it.
-        inChannel.close();
-        aFile.close();
+         // do something with the data and clear/compact it.
+
 
         System.out.println("Before offset:");
         for (int i = 0; i < beforeOffset.length; i++) {
@@ -67,16 +70,22 @@ public class HandleInsertToFile {
             System.out.print((char) afterOffset[i]);
         }
 
-        // Rewrite file up to offset
-        FileOutputStream outputStream = new FileOutputStream(filePath);
-        outputStream.write(beforeOffset);
+
+        //FileOutputStream outputStream = new FileOutputStream(filePath);
+        aFile.write(beforeOffset);
 
         // Insert contents to file
-        outputStream.write(content.getBytes());
+        aFile.write(content.getBytes());
 
         // Rewrite rest of the file
-        outputStream.write(afterOffset);
-        outputStream.close();
+        aFile.write(afterOffset);
+        //outputStream.close();
+
+        // Rewrite file up to offset
+        buffer.clear();
+        inChannel.close();
+        aFile.close();
+
 
         return "Successfully inserted to file " + filePath;
     }

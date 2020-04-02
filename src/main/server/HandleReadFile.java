@@ -1,5 +1,7 @@
 package main.server;
 
+import main.client.Constants;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
@@ -30,7 +32,6 @@ public class HandleReadFile {
             byte[] response = createACK(server.getID(), "1", readFile(filePath, offset, numBytes));
             server.send(response, 1, address, port);
             String notification = address.toString() + ":" + port + " read " + filePath;
-            HandleMonitor.notify(server, filePath, notification);
         } catch (IOException e) {
             System.out.println(e);
             String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
@@ -39,9 +40,9 @@ public class HandleReadFile {
         }
     }
 
-    public static String readFile(String filePath, int offset, int numBytes) throws IOException {
+        public static String readFile(String filePath, int offset, int numBytes) throws IOException {
         // TODO: CHECK ALL TEST CASES
-        filePath = "src/main/server/data/" + filePath;
+        filePath = Constants.FILEPATH + filePath;
         RandomAccessFile aFile = new RandomAccessFile(filePath, "r");
         FileChannel inChannel = aFile.getChannel();
         MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, offset,
