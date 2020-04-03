@@ -3,6 +3,7 @@ package test;
 import java.io.File;
 import java.io.IOException;
 
+import server.HandleCountChar;
 import server.HandleDeleteInFile;
 import server.HandleInsertToFile;
 import server.HandleReadFile;
@@ -15,7 +16,7 @@ public class TestFileHandling {
          */
         // TODO: change file path to src/main/server/data + filePath in all functions
         try {
-            HandleDeleteInFile.deleteInFile("data.txt", 2, 3);
+            HandleCountChar.countChar("data.txt", 'u');
         } catch (Exception e) {
             System.out.println("Exception raised");
         }

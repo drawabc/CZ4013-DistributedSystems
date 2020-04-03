@@ -15,7 +15,7 @@ public class App {
 
         while (true) {
             System.out.println(
-                    "\n(1) Read file\t(2) Insert to file\t(3) Monitor file updates\t(4) Delete characters in file\t(0) Exit");
+                    "\n(1) Read file\t(2) Insert to file\t(3) Monitor file updates\t(4) Delete characters in file\t(5)Count Characters\t(0) Exit");
 
             int choice = Integer.parseInt(sc.nextLine());
 
@@ -43,7 +43,6 @@ public class App {
                         Long duration = MonitorUpdates.getDuration(response);
                         System.out.println("Monitoring for " + duration / 1000 + " s");
                         udpclient.setTimeout(duration.intValue());
-                        // TODO: fix or add timer (?)
                         while (true) {
                             try {
                                 MonitorUpdates.handleResponse(udpclient.receive());
@@ -68,6 +67,12 @@ public class App {
                     b = DeleteInFile.promptUser(sc, udpclient.getID());
                     response = udpclient.requestReply(b);
                     DeleteInFile.handleResponse(response);
+                    break;
+
+                case 5:
+                    b = CountChar.promptUser(sc, udpclient.getID());
+                    response = udpclient.requestReply(b);
+                    CountChar.handleResponse(response);
                     break;
                 default:
                     System.out.println("Wrong choice");
