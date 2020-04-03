@@ -37,7 +37,11 @@ public class UDPServer {
             HandleMonitor.handleRequest(this, data, address, port);
         } else if (serviceID == 4) {
             HandleDeleteInFile.handleRequest(this, data, address, port);
-        } else {
+
+        } else if (serviceID == 5) {
+            HandleCountChar.handleRequest(this, data, address, port);
+        }
+        else {
             System.out.println("Error: serviceID is invalid.");
             String errorMsg = "Requested service is invalid.";
             byte[] response = HandleReadFile.createACK(this.getID(), "0", errorMsg);
