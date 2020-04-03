@@ -1,5 +1,7 @@
 package server;
 
+import client.Constants;
+
 import java.io.File;
 import java.net.InetAddress;
 import java.time.Clock;
@@ -32,9 +34,10 @@ public class HandleMonitor {
 
         System.out.println(String.format("%s %d", filePath, interval));
 
-        if (new File(filePath).isFile()) {
+        String absfilePath = Constants.FILEPATH + filePath;
+        if (new File(absfilePath).isFile()) {
             Watcher watcher = new Watcher(address, port, clock.millis(), interval);
-            addWatcher(watcher, filePath);
+            addWatcher(watcher, absfilePath);
             System.out.println("Added " + filePath + " watcher: " + address + ":" + port);
 
             byte[] response = createACK(server.getID(), "1", String.valueOf(watcher.getRemainingDuration()));

@@ -1,5 +1,7 @@
 package server;
 
+import client.Constants;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -31,7 +33,7 @@ public class HandleDeleteInFile {
             byte[] response = createACK(server.getID(), "1", deleteInFile(filePath, offset, numBytes));
             server.send(response, 4, address, port);
             String notification = address.toString() + ":" + port + " editted " + filePath;
-            HandleMonitor.notify(server, filePath, notification);
+            HandleMonitor.notify(server, Constants.FILEPATH + filePath, notification);
         } catch (IOException e) {
             System.out.println(e);
             String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
@@ -43,7 +45,7 @@ public class HandleDeleteInFile {
 
     public static String deleteInFile(String filePath, int offset, int numBytes) throws IOException {
         // Read file
-        filePath = "server/data/" + filePath;
+        filePath = Constants.FILEPATH + filePath;
         RandomAccessFile aFile = new RandomAccessFile(filePath, "r");
         FileChannel inChannel = aFile.getChannel();
         MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
