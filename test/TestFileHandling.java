@@ -15,10 +15,9 @@ public class TestFileHandling {
          */
         // TODO: change file path to src/main/server/data + filePath in all functions
         try {
-            File aFile = new File("src/main/server/data/data.txt");
-            HandleInsertToFile.insertToFile("src/main/server/data/data.txt", 1, "tes");
+            HandleDeleteInFile.deleteInFile("data.txt", 2, 1);
         } catch (Exception e) {
-            System.out.print(e);
+            System.out.println("Exception raised");
         }
     }
 }

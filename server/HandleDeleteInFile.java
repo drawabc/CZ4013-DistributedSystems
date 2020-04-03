@@ -2,6 +2,7 @@ package server;
 
 import client.Constants;
 
+import java.io.EOFException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -9,6 +10,7 @@ import java.net.InetAddress;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.RandomAccess;
 
 public class HandleDeleteInFile {
     public static void handleRequest(UDPServer server, byte[] message, InetAddress address, int port) {
@@ -46,9 +48,10 @@ public class HandleDeleteInFile {
     public static String deleteInFile(String filePath, int offset, int numBytes) throws IOException {
         // Read file
         filePath = Constants.FILEPATH + filePath;
-        RandomAccessFile aFile = new RandomAccessFile(filePath, "r");
-        FileChannel inChannel = aFile.getChannel();
-        MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
+        RandomAccessFile aFile = new RandomAccessFile(filePath, "rw");
+        //FileChannel inChannel = aFile.getChannel();
+        /*
+        MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_WRITE, 0, inChannel.size());
 
         byte[] beforeOffset = new byte[offset];
         buffer.get(beforeOffset, 0, offset);
@@ -59,10 +62,6 @@ public class HandleDeleteInFile {
             buffer.get();
         buffer.get(afterOffset);
 
-        buffer.clear(); // do something with the data and clear/compact it.
-        inChannel.close();
-        aFile.close();
-
         System.out.println("Before offset:");
         for (int i = 0; i < beforeOffset.length; i++) {
             System.out.print((char) beforeOffset[i]);
@@ -72,12 +71,45 @@ public class HandleDeleteInFile {
         for (int i = 0; i < afterOffset.length; i++) {
             System.out.print((char) afterOffset[i]);
         }
+        */
+        //buffer.clear();
+        //aFile.setLength(0);
+        ArrayList<Byte> x = new ArrayList<Byte>();
+        byte c;
+        try{
+            while(true){
+                c = aFile.readByte();
+                x.add(c);
+            }
+        } catch (EOFException e){
+            System.out.println("File Length = " + x.size());
+        }
+        try{
+            byte[] beforeOffset = new byte[offset];
+            for(int i = 0; i<offset;i++){
+                beforeOffset[i] = x.get(i);
+            }
+            byte[] afterOffset = new byte[x.size() - beforeOffset.length - numBytes];
+            int j = 0;
+            for (int i = offset + 1; i < x.size();i++){
+                afterOffset[j] = x.get(i);
+                j++;
+            }
+            aFile.setLength(0);//inChannel.close();
+            aFile.write(beforeOffset);
+            aFile.write(afterOffset);
+        } catch (Exception e){
+            //e.printStackTrace();
+        }
+        aFile.close();
+         // do something with the data and clear/compact it.
 
+        /*
         FileOutputStream outputStream = new FileOutputStream(filePath);
         outputStream.write(beforeOffset);
         outputStream.write(afterOffset);
         outputStream.close();
-
+         */
         return "Successfully deleted " + numBytes + "bytes in file " + filePath;
     }
 
