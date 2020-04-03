@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c0bc6ebb-29cb-4746-a995-29b66ff596ae" name="Default Changelist" comment="" />
+    <list default="true" id="c0bc6ebb-29cb-4746-a995-29b66ff596ae" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CZ4013/server/data/data.txt" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CZ4013/server/data/data.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/HandleDeleteInFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/HandleDeleteInFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/data/data.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server/data/data.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/TestFileHandling.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/TestFileHandling.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,25 +42,26 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/test" />
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.0" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="inlay.hints" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\test" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\test\data" />
       <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\test" />
       <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\main\server\data" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\test" />
+    </key>
   </component>
-  <component name="RunManager" selected="Application.App">
+  <component name="RunManager" selected="Application.TestFileHandling">
     <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="main.client.App" />
+      <option name="MAIN_CLASS_NAME" value="client.App" />
       <module name="CZ4013" />
       <extension name="coverage">
         <pattern>
@@ -80,6 +87,8 @@
       </method>
     </configuration>
     <configuration name="TestFileHandling" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="13.0.2" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="test.TestFileHandling" />
       <module name="CZ4013" />
       <extension name="coverage">
@@ -106,7 +115,7 @@
       </method>
     </configuration>
     <configuration name="UDPServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="main.server.UDPServer" />
+      <option name="MAIN_CLASS_NAME" value="server.UDPServer" />
       <module name="CZ4013" />
       <extension name="coverage">
         <pattern>
@@ -118,11 +127,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Application.App" />
+      <item itemvalue="Application.Playground" />
+      <item itemvalue="Application.TestFileHandling" />
+      <item itemvalue="Application.UDPClient" />
+      <item itemvalue="Application.UDPServer" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.App" />
-        <item itemvalue="Application.UDPServer" />
         <item itemvalue="Application.TestFileHandling" />
+        <item itemvalue="Application.UDPServer" />
+        <item itemvalue="Application.App" />
         <item itemvalue="Application.Playground" />
         <item itemvalue="Application.UDPClient" />
       </list>
@@ -146,10 +162,14 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="233" y="0" key="#Project_Structure/0.0.1280.680@0.0.1280.680" timestamp="1583908821519" />
-    <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1585582203212">
+    <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1585908589227">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1585582203212" />
+    <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1585908589227" />
+    <state x="490" y="230" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1585903157230">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="490" y="230" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1280.680@0.0.1280.680" timestamp="1585903157230" />
     <state x="438" y="225" width="404" height="236" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1585579334409">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -158,50 +178,54 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="93" y="93" width="1095" height="495" key="DiffContextDialog/0.0.1280.680@0.0.1280.680" timestamp="1585584059427" />
-    <state x="421" y="50" key="FileChooserDialogImpl" timestamp="1585488279777">
+    <state x="421" y="50" key="FileChooserDialogImpl" timestamp="1585903131792">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="421" y="50" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1585488279777" />
-    <state width="1241" height="162" key="GridCell.Tab.0.bottom" timestamp="1585902927219">
+    <state x="421" y="50" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1585903131792" />
+    <state width="1237" height="160" key="GridCell.Tab.0.bottom" timestamp="1585911958804">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1241" height="162" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1585902927219" />
-    <state width="1241" height="162" key="GridCell.Tab.0.center" timestamp="1585902927219">
+    <state width="1237" height="160" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1585911958804" />
+    <state width="1237" height="160" key="GridCell.Tab.0.center" timestamp="1585911958804">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1241" height="162" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1585902927219" />
-    <state width="1241" height="162" key="GridCell.Tab.0.left" timestamp="1585902927219">
+    <state width="1237" height="160" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1585911958804" />
+    <state width="1237" height="160" key="GridCell.Tab.0.left" timestamp="1585911958803">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1241" height="162" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1585902927219" />
-    <state width="1241" height="162" key="GridCell.Tab.0.right" timestamp="1585902927219">
+    <state width="1237" height="160" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1585911958803" />
+    <state width="1237" height="160" key="GridCell.Tab.0.right" timestamp="1585911958804">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1241" height="162" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1585902927219" />
-    <state width="1237" height="204" key="GridCell.Tab.1.bottom" timestamp="1585842178318">
+    <state width="1237" height="160" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1585911958804" />
+    <state width="1237" height="204" key="GridCell.Tab.1.bottom" timestamp="1585903114296">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="204" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1585842178318" />
-    <state width="1237" height="204" key="GridCell.Tab.1.center" timestamp="1585842178318">
+    <state width="1237" height="204" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1585903114296" />
+    <state width="1237" height="204" key="GridCell.Tab.1.center" timestamp="1585903114296">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="204" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1585842178318" />
-    <state width="1237" height="204" key="GridCell.Tab.1.left" timestamp="1585842178318">
+    <state width="1237" height="204" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1585903114296" />
+    <state width="1237" height="204" key="GridCell.Tab.1.left" timestamp="1585903114295">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="204" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1585842178318" />
-    <state width="1237" height="204" key="GridCell.Tab.1.right" timestamp="1585842178318">
+    <state width="1237" height="204" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1585903114295" />
+    <state width="1237" height="204" key="GridCell.Tab.1.right" timestamp="1585903114296">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="204" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1585842178318" />
+    <state width="1237" height="204" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1585903114296" />
     <state x="441" y="52" key="RollbackChangesDialog" timestamp="1585572799788">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="441" y="52" key="RollbackChangesDialog/0.0.1280.680@0.0.1280.680" timestamp="1585572799788" />
-    <state x="142" y="0" key="SettingsEditor" timestamp="1585583957647">
+    <state x="142" y="0" key="SettingsEditor" timestamp="1585908663678">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="142" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1585583957647" />
+    <state x="142" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1585908663678" />
+    <state x="452" y="119" key="chooseDestDirectoryDialog" timestamp="1585903723471">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="452" y="119" key="chooseDestDirectoryDialog/0.0.1280.680@0.0.1280.680" timestamp="1585903723471" />
     <state x="341" y="164" key="com.intellij.ide.util.TipDialog" timestamp="1585841401956">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -214,9 +238,9 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="297" y="151" key="run.anything.popup/0.0.1280.680@0.0.1280.680" timestamp="1584101343015" />
-    <state x="303" y="1" width="672" height="678" key="search.everywhere.popup" timestamp="1585584777295">
+    <state x="303" y="1" width="672" height="678" key="search.everywhere.popup" timestamp="1585905922851">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="303" y="1" width="672" height="678" key="search.everywhere.popup/0.0.1280.680@0.0.1280.680" timestamp="1585584777295" />
+    <state x="303" y="1" width="672" height="678" key="search.everywhere.popup/0.0.1280.680@0.0.1280.680" timestamp="1585905922851" />
   </component>
 </project>
