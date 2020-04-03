@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0bc6ebb-29cb-4746-a995-29b66ff596ae" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/client/CountChar.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/HandleCountChar.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CZ4013/server/data/data.txt" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CZ4013/server/data/data.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/UDPServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/UDPServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/TestFileHandling.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/TestFileHandling.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,17 +46,17 @@
     <property name="settings.editor.selected.configurable" value="inlay.hints" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\test\data" />
+    <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\test" />
-      <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\main\server\data" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="server" />
       <recent name="client" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\test\data" />
       <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\test" />
+      <recent name="C:\Users\Edward\IdeaProjects\CZ4013\src\main\server\data" />
     </key>
   </component>
   <component name="RunManager" selected="Application.UDPServer">
