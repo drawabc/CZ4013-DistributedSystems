@@ -46,11 +46,13 @@ public class HandleDeleteInFile {
     }
 
     public static String deleteInFile(String filePath, int offset, int numBytes) throws IOException {
+        // TODO: check exception XD
         // Read file
         filePath = Constants.FILEPATH + filePath;
         RandomAccessFile aFile = new RandomAccessFile(filePath, "rw");
-        //FileChannel inChannel = aFile.getChannel();
         /*
+        FileChannel inChannel = aFile.getChannel();
+
         MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_WRITE, 0, inChannel.size());
 
         byte[] beforeOffset = new byte[offset];
@@ -71,9 +73,12 @@ public class HandleDeleteInFile {
         for (int i = 0; i < afterOffset.length; i++) {
             System.out.print((char) afterOffset[i]);
         }
+        buffer.clear();
+        aFile.setLength(0);
         */
-        //buffer.clear();
-        //aFile.setLength(0);
+
+
+        // Read file contents
         ArrayList<Byte> x = new ArrayList<Byte>();
         byte c;
         try{
@@ -84,23 +89,24 @@ public class HandleDeleteInFile {
         } catch (EOFException e){
             System.out.println("File Length = " + x.size());
         }
-        try{
-            byte[] beforeOffset = new byte[offset];
-            for(int i = 0; i<offset;i++){
-                beforeOffset[i] = x.get(i);
-            }
-            byte[] afterOffset = new byte[x.size() - beforeOffset.length - numBytes];
-            int j = 0;
-            for (int i = offset + 1; i < x.size();i++){
-                afterOffset[j] = x.get(i);
-                j++;
-            }
-            aFile.setLength(0);//inChannel.close();
-            aFile.write(beforeOffset);
-            aFile.write(afterOffset);
-        } catch (Exception e){
-            //e.printStackTrace();
+
+        // seperate file before Offset
+        byte[] beforeOffset = new byte[offset];
+        for (int i = 0; i < offset; i++) {
+            beforeOffset[i] = x.get(i);
         }
+
+        // seperate file after deletion
+        byte[] afterOffset = new byte[x.size() - beforeOffset.length - numBytes];
+        int j = 0;
+        for (int i = offset + numBytes; i < x.size(); i++) {
+            afterOffset[j] = x.get(i);
+            j++;
+        }
+        aFile.setLength(0);
+        aFile.write(beforeOffset);
+        aFile.write(afterOffset);
+
         aFile.close();
          // do something with the data and clear/compact it.
 

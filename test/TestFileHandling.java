@@ -15,7 +15,7 @@ public class TestFileHandling {
          */
         // TODO: change file path to src/main/server/data + filePath in all functions
         try {
-            HandleDeleteInFile.deleteInFile("data.txt", 2, 1);
+            HandleDeleteInFile.deleteInFile("data.txt", 2, 3);
         } catch (Exception e) {
             System.out.println("Exception raised");
         }
