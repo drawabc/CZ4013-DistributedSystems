@@ -15,31 +15,36 @@ public class HandleInsertToFile {
     public static void handleRequest(UDPServer server, byte[] message, InetAddress address, int port) {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         String filePath = Utils.unmarshal(message, pointer, pointer + length);
         pointer += length;
 
         length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         int offset = Utils.unmarshal(message, pointer);
         pointer += length;
 
         length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         String content = Utils.unmarshal(message, pointer, pointer + length);
 
         System.out.println(String.format("Insert to file: %s %d %s", filePath, offset, content));
 
         try {
-            byte[] response = createACK(server.getID(), "1", insertToFile(filePath, offset, content));
-            server.send(response, 2, address, port);
-            String notification = address.toString() + ":" + port + " editted " + filePath;
-            HandleMonitor.notify(server, Constants.FILEPATH + filePath, notification);
+            // Update file modified timestamp
+            LastModified.update(filePath);
+
+            String fileContents = insertToFile(filePath, offset, content);
+            byte[] response = createACK(server.getID(), "1", LastModified.getTimestamp(filePath), fileContents);
+            server.send(response, Constants.INSERTTOFILE_ID, address, port);
+
+            // Notify clients who are monitoring this file
+            HandleMonitor.notify(server, Constants.FILEPATH + filePath, fileContents);
         } catch (IOException e) {
             System.out.println(e);
             String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
-            byte[] response = createACK(server.getID(), "0", errorMsg);
-            server.send(response, 2, address, port);
+            byte[] response = createNAK(server.getID(), "0", errorMsg);
+            server.send(response, Constants.INSERTTOFILE_ID, address, port);
         }
 
     }
@@ -83,10 +88,23 @@ public class HandleInsertToFile {
         inChannel.close();
         aFile.close();
 
-        return "Successfully inserted to file " + filePath;
+        return new String(beforeOffset) + content + new String(afterOffset);
+
+        // return "Successfully inserted to file " + filePath;
     }
 
-    public static byte[] createACK(int id, String status, String message) {
+    public static byte[] createACK(int id, String status, long time, String message) {
+        ArrayList<Byte> response = new ArrayList<Byte>();
+
+        Utils.appendMsg(response, id);
+        Utils.appendMsg(response, status);
+        Utils.appendMsg(response, time);
+        Utils.appendMsgHeader(response, message);
+
+        return Utils.unwrapList(response);
+    }
+
+    public static byte[] createNAK(int id, String status, String message) {
         ArrayList<Byte> response = new ArrayList<Byte>();
 
         Utils.appendMsg(response, id);

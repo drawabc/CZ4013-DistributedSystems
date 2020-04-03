@@ -1,17 +1,20 @@
 package client;
 
-import java.io.IOException;
-
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
-
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class App {
+    static long refreshRate;
+    static HashMap<String, Cache> cacheMap = new HashMap<String, Cache>();
+    static UDPClient udpclient = new UDPClient();
+
     public static void main(String args[]) {
-        UDPClient udpclient = new UDPClient();
         Scanner sc = new Scanner(System.in);
         byte[] b = null;
+
+        System.out.println("Please enter the refresh rate for cache:");
+        App.refreshRate = Integer.parseInt(sc.nextLine()) * 1000;
 
         while (true) {
             System.out.println(
@@ -27,14 +30,10 @@ public class App {
                     System.exit(0);
                     break;
                 case 1:
-                    b = ReadFile.promptUser(sc, udpclient.getID());
-                    response = udpclient.requestReply(b);
-                    ReadFile.handleResponse(response);
+                    ReadFile.promptUser(sc);
                     break;
                 case 2:
-                    b = InsertToFile.promptUser(sc, udpclient.getID());
-                    response = udpclient.requestReply(b);
-                    InsertToFile.handleResponse(response);
+                    InsertToFile.promptUser(sc);
                     break;
                 case 3:
                     b = MonitorUpdates.promptUser(sc, udpclient.getID());
@@ -61,13 +60,8 @@ public class App {
                     }
 
                     break;
-                // while (MonitorUpdates.isMonitoring()) { // TODO: implement proper timeout
-                // MonitorUpdates.handleResponse(udpclient.receive());
-                // }
                 case 4:
-                    b = DeleteInFile.promptUser(sc, udpclient.getID());
-                    response = udpclient.requestReply(b);
-                    DeleteInFile.handleResponse(response);
+                    DeleteInFile.promptUser(sc);
                     break;
                 default:
                     System.out.println("Wrong choice");

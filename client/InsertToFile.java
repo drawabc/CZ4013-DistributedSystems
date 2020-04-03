@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class InsertToFile {
     // Parameters: file pathname, offset (bytes), content to insert
-    public static byte[] promptUser(Scanner sc, int id) {
+    public static void promptUser(Scanner sc) {
         System.out.println("Enter file pathname:");
         String filePath = sc.nextLine();
 
@@ -15,14 +15,16 @@ public class InsertToFile {
         System.out.println("Enter content to be inserted:");
         String content = sc.nextLine();
 
-        return constructRequest(id, filePath, offset, content);
+        byte[] response = App.udpclient
+                .requestReply(constructRequest(App.udpclient.getID(), filePath, offset, content));
+        handleResponse(response, filePath);
     }
 
     public static byte[] constructRequest(int id, String filePath, int offset, String content) {
         ArrayList<Byte> request = new ArrayList<Byte>();
 
         Utils.appendMsg(request, id);
-        Utils.appendMsg(request, 2); // Type of service ID
+        Utils.appendMsg(request, Constants.INSERTTOFILE_ID);
         Utils.appendMsgHeader(request, filePath);
         Utils.appendMsgHeader(request, offset);
         Utils.appendMsgHeader(request, content);
@@ -30,20 +32,32 @@ public class InsertToFile {
         return Utils.unwrapList(request);
     }
 
-    public static void handleResponse(byte[] response) {
+    public static void handleResponse(byte[] response, String filePath) {
         int pointer = 0;
         String status = Utils.unmarshal(response, pointer, 1);
         pointer++;
 
         if (status.equals("1")) {
+            long lastModified = Utils.unmarshalLong(response, pointer);
+            pointer += Constants.LONG_SIZE;
             int length = Utils.unmarshal(response, pointer);
-            pointer += 4;
-            String message = Utils.unmarshal(response, pointer, pointer + length);
+            pointer += Constants.INT_SIZE;
+            String content = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
-            System.out.println(message);
+
+            Cache cache = App.cacheMap.get(filePath);
+            if (cache == null) {
+                cache = new Cache(filePath);
+                App.cacheMap.put(filePath, cache);
+            }
+            cache.updateCache(lastModified, content);
+
+            System.out.println("Successfully editted file! New file contents:");
+            System.out.println(cache.getFileContent());
+
         } else if (status.equals("0")) {
             int length = Utils.unmarshal(response, pointer);
-            pointer += 4;
+            pointer += Constants.INT_SIZE;
             String message = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
             System.out.println(message);

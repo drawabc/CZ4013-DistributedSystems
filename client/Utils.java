@@ -12,6 +12,24 @@ public class Utils {
         return b[start] << 24 | (b[start + 1] & 0xFF) << 16 | (b[start + 2] & 0xFF) << 8 | (b[start + 3] & 0xFF);
     }
 
+    public static byte[] marshalLong(long x) {
+        byte[] result = new byte[8];
+        for (int i = 7; i >= 0; i--) {
+            result[i] = (byte) (x);
+            x >>= 8;
+        }
+        return result;
+    }
+
+    public static long unmarshalLong(byte[] b, int start) {
+        long result = 0;
+        for (int i = start; i < Long.BYTES + start; i++) {
+            result <<= Long.BYTES;
+            result |= (b[i] & 0xFF);
+        }
+        return result;
+    }
+
     public static byte[] marshal(String s) {
         byte[] b = new byte[s.length()];
         for (int i = 0; i < s.length(); i++) {

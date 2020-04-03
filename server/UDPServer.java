@@ -29,18 +29,20 @@ public class UDPServer {
     }
 
     public void handleClientRequest(int serviceID, byte[] data, InetAddress address, int port) {
-        if (serviceID == 1) {
+        if (serviceID == Constants.READFILE_ID) {
             HandleReadFile.handleRequest(this, data, address, port);
-        } else if (serviceID == 2) {
+        } else if (serviceID == Constants.INSERTTOFILE_ID) {
             HandleInsertToFile.handleRequest(this, data, address, port);
-        } else if (serviceID == 3) {
+        } else if (serviceID == Constants.MONITORFILE_ID) {
             HandleMonitor.handleRequest(this, data, address, port);
-        } else if (serviceID == 4) {
+        } else if (serviceID == Constants.DELETEINFILE_ID) {
             HandleDeleteInFile.handleRequest(this, data, address, port);
+        } else if (serviceID == Constants.CHECKCACHE_ID) {
+            LastModified.handleRequest(this, data, address, port);
         } else {
             System.out.println("Error: serviceID is invalid.");
             String errorMsg = "Requested service is invalid.";
-            byte[] response = HandleReadFile.createACK(this.getID(), "0", errorMsg);
+            byte[] response = HandleInsertToFile.createNAK(this.getID(), "0", errorMsg);
             this.send(response, 2, address, port);
         }
     }

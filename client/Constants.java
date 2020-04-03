@@ -8,6 +8,15 @@ public class Constants {
     public static final int AT_MOST_ONCE = 1;
     public static final int DEFAULT_SEMANTIC_INVOCATION = AT_LEAST_ONCE;
     public static final int DEFAULT_TIMEOUT = 2000;
-    public static final String FILEPATH = "server/data/";
 
+    public static final int READFILE_ID = 1;
+    public static final int INSERTTOFILE_ID = 2;
+    public static final int MONITORFILE_ID = 3;
+    public static final int DELETEINFILE_ID = 4;
+    public static final int CHECKCACHE_ID = 5;
+
+    public static final int LONG_SIZE = 8;
+    public static final int INT_SIZE = 4;
+
+    public static final String FILEPATH = "server/data/";
 }
