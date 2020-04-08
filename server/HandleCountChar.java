@@ -14,27 +14,26 @@ public class HandleCountChar {
     public static void handleRequest(UDPServer server, byte[] message, InetAddress address, int port) {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         String filePath = Utils.unmarshal(message, pointer, pointer + length);
         pointer += length;
 
         length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         String selectedString = Utils.unmarshal(message, pointer, pointer + length);
         char selected = selectedString.charAt(0);
         pointer += length;
-
 
         System.out.println(String.format("Count Character: %s %s", filePath, selected));
 
         try {
             byte[] response = createACK(server.getID(), "1", countChar(filePath, selected));
-            server.send(response, 5, address, port);
+            server.send(response, Constants.COUNTCHAR_ID, address, port);
         } catch (IOException e) {
             System.out.println(e);
             String errorMsg = "An error occured. Either the filename is incorrect or the input exceeds the 1";
             byte[] response = createACK(server.getID(), "0", errorMsg);
-            server.send(response, 5, address, port);
+            server.send(response, Constants.COUNTCHAR_ID, address, port);
         }
     }
 
@@ -42,18 +41,17 @@ public class HandleCountChar {
         filePath = Constants.FILEPATH + filePath;
         RandomAccessFile aFile = new RandomAccessFile(filePath, "r");
         FileChannel inChannel = aFile.getChannel();
-        MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0,
-                inChannel.size());
+        MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
         byte[] byteData = new byte[buffer.capacity()];
         buffer.get(byteData, 0, buffer.capacity());
         String data = new String(byteData, StandardCharsets.UTF_8);
         int counter = 0;
-        for (int i = 0; i< data.length(); i++){
-            if (data.charAt(i) == selected){
+        for (int i = 0; i < data.length(); i++) {
+            if (data.charAt(i) == selected) {
                 counter++;
             }
         }
-        System.out.println("There are " + counter +  " character(s)");
+        System.out.println("There are " + counter + " character(s)");
 
         buffer.clear(); // do something with the data and clear/compact it.
         inChannel.close();

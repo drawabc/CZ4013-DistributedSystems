@@ -13,29 +13,29 @@ public class HandleReadFile {
     public static void handleRequest(UDPServer server, byte[] message, InetAddress address, int port) {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         String filePath = Utils.unmarshal(message, pointer, pointer + length);
         pointer += length;
 
         length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         int offset = Utils.unmarshal(message, pointer);
         pointer += length;
 
         length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         int numBytes = Utils.unmarshal(message, pointer);
 
         System.out.println(String.format("Read file: %s %d %d", filePath, offset, numBytes));
 
         try {
             byte[] response = createACK(server.getID(), "1", readFile(filePath, offset, numBytes));
-            server.send(response, 1, address, port);
+            server.send(response, Constants.READFILE_ID, address, port);
         } catch (IOException e) {
             System.out.println(e);
             String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
             byte[] response = createACK(server.getID(), "0", errorMsg);
-            server.send(response, 1, address, port);
+            server.send(response, Constants.READFILE_ID, address, port);
         }
     }
 

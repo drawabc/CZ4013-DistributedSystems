@@ -24,12 +24,12 @@ public class HandleMonitor {
     public static void handleRequest(UDPServer server, byte[] message, InetAddress address, int port) {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         String filePath = Utils.unmarshal(message, pointer, pointer + length);
         pointer += length;
 
         length = Utils.unmarshal(message, pointer);
-        pointer += 4;
+        pointer += Constants.INT_SIZE;
         int interval = Utils.unmarshal(message, pointer);
 
         System.out.println(String.format("%s %d", filePath, interval));
@@ -41,11 +41,11 @@ public class HandleMonitor {
             System.out.println("Added " + filePath + " watcher: " + address + ":" + port);
 
             byte[] response = createACK(server.getID(), "1", String.valueOf(watcher.getRemainingDuration()));
-            server.send(response, 3, address, port);
+            server.send(response, Constants.MONITORFILE_ID, address, port);
         } else {
             String errorMsg = "An error occured. Cannot find file " + filePath + ".";
             byte[] response = createACK(server.getID(), "0", errorMsg);
-            server.send(response, 3, address, port);
+            server.send(response, Constants.MONITORFILE_ID, address, port);
         }
     }
 
@@ -61,7 +61,7 @@ public class HandleMonitor {
             if (watcher.isAvailable()) {
                 System.out.println("Notifying: " + watcher.getAddress().toString() + ":" + watcher.getPort());
                 byte[] response = createACK(server.getID(), "1", content);
-                server.send(response, 3, watcher.getAddress(), watcher.getPort());
+                server.send(response, Constants.MONITORFILE_ID, watcher.getAddress(), watcher.getPort());
             } else {
                 unavailableWatchers.add(watcher);
             }
