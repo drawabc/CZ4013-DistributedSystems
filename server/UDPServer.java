@@ -35,6 +35,8 @@ public class UDPServer {
             HandleInsertToFile.handleRequest(this, data, address, port);
         } else if (serviceID == Constants.MONITORFILE_ID) {
             HandleMonitor.handleRequest(this, data, address, port);
+        } else if (serviceID == Constants.MONITOREND_ID) {
+            HandleMonitor.handleEndRequest(this, data, address, port);
         } else if (serviceID == Constants.DELETEINFILE_ID) {
             HandleDeleteInFile.handleRequest(this, data, address, port);
         } else if (serviceID == Constants.COUNTCHAR_ID) {
