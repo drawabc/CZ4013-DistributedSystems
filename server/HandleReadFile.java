@@ -2,6 +2,7 @@ package server;
 
 import client.Constants;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
@@ -28,33 +29,47 @@ public class HandleReadFile {
 
         System.out.println(String.format("Read file: %s %d %d", filePath, offset, numBytes));
 
-        try {
-            byte[] response = createACK(server.getID(), "1", readFile(filePath, offset, numBytes));
-            server.send(response, Constants.READFILE_ID, address, port);
-        } catch (IOException e) {
-            System.out.println(e);
-            String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
+        String fileContent = readFile(filePath, offset, numBytes);
+        String errorMsg;
+        if (fileContent.equals("FileNotFound")) {
+            errorMsg = "An error occured. The file " + filePath + " does not exist.";
             byte[] response = createACK(server.getID(), "0", errorMsg);
+            server.send(response, Constants.READFILE_ID, address, port);
+        } else if (fileContent.equals("IOException")) {
+            errorMsg = "An error occured. Maybe the offset is too large?";
+            byte[] response = createACK(server.getID(), "0", errorMsg);
+            server.send(response, Constants.READFILE_ID, address, port);
+        } else {
+            byte[] response = createACK(server.getID(), "1", fileContent);
             server.send(response, Constants.READFILE_ID, address, port);
         }
     }
 
-    public static String readFile(String filePath, int offset, int numBytes) throws IOException {
+    public static String readFile(String filePath, int offset, int numBytes) {
         // TODO: CHECK ALL TEST CASES
         filePath = Constants.FILEPATH + filePath;
-        RandomAccessFile aFile = new RandomAccessFile(filePath, "r");
+        RandomAccessFile aFile;
+        try {
+            aFile = new RandomAccessFile(filePath, "r");
+        } catch (FileNotFoundException e) {
+            return "FileNotFound";
+        }
         FileChannel inChannel = aFile.getChannel();
-        MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, offset,
-                Math.min(inChannel.size() - offset, numBytes));
+        MappedByteBuffer buffer;
+        try {
+            buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, offset,
+                    Math.min(inChannel.size() - offset, numBytes));
+            byte[] b = new byte[buffer.remaining()];
+            buffer.get(b);
 
-        byte[] b = new byte[buffer.remaining()];
-        buffer.get(b);
+            buffer.clear(); // do something with the data and clear/compact it.
+            inChannel.close();
+            aFile.close();
 
-        buffer.clear(); // do something with the data and clear/compact it.
-        inChannel.close();
-        aFile.close();
-
-        return new String(b);
+            return new String(b);
+        } catch (IOException e) {
+            return "IOException";
+        }
     }
 
     public static byte[] createACK(int id, String status, String message) {

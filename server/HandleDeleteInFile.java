@@ -3,14 +3,11 @@ package server;
 import client.Constants;
 
 import java.io.EOFException;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.RandomAccess;
 
 public class HandleDeleteInFile {
     public static void handleRequest(UDPServer server, byte[] message, InetAddress address, int port) {
@@ -31,25 +28,34 @@ public class HandleDeleteInFile {
 
         System.out.println(String.format("Delete in file: %s %d %d", filePath, offset, numBytes));
 
-        try {
-            byte[] response = createACK(server.getID(), "1", deleteInFile(filePath, offset, numBytes));
+        String fileContent = deleteInFile(filePath, offset, numBytes);
+        String errorMsg;
+        if (fileContent.equals("FileNotFound")) {
+            errorMsg = "An error occured. The file " + filePath + " does not exist.";
+            byte[] response = createACK(server.getID(), "0", errorMsg);
+            server.send(response, Constants.DELETEINFILE_ID, address, port);
+        } else if (fileContent.equals("IOException")) {
+            errorMsg = "An error occured. Maybe the offset is too large?";
+            byte[] response = createACK(server.getID(), "0", errorMsg);
+            server.send(response, Constants.DELETEINFILE_ID, address, port);
+        } else {
+            byte[] response = createACK(server.getID(), "1", fileContent);
             server.send(response, Constants.DELETEINFILE_ID, address, port);
             String notification = address.toString() + ":" + port + " editted " + filePath;
             HandleMonitor.notify(server, Constants.FILEPATH + filePath, notification);
-        } catch (IOException e) {
-            System.out.println(e);
-            String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
-            byte[] response = createACK(server.getID(), "0", errorMsg);
-            server.send(response, Constants.DELETEINFILE_ID, address, port);
         }
-
     }
 
-    public static String deleteInFile(String filePath, int offset, int numBytes) throws IOException {
+    public static String deleteInFile(String filePath, int offset, int numBytes) {
         // TODO: check exception XD
         // Read file
         filePath = Constants.FILEPATH + filePath;
-        RandomAccessFile aFile = new RandomAccessFile(filePath, "rw");
+        RandomAccessFile aFile;
+        try {
+            aFile = new RandomAccessFile(filePath, "rw");
+        } catch (FileNotFoundException e1) {
+            return "FileNotFound";
+        }
         /*
          * FileChannel inChannel = aFile.getChannel();
          * 
@@ -80,6 +86,8 @@ public class HandleDeleteInFile {
             }
         } catch (EOFException e) {
             System.out.println("File Length = " + x.size());
+        } catch (IOException e) {
+            return "IOException";
         }
 
         // seperate file before Offset
@@ -95,11 +103,17 @@ public class HandleDeleteInFile {
             afterOffset[j] = x.get(i);
             j++;
         }
-        aFile.setLength(0);
-        aFile.write(beforeOffset);
-        aFile.write(afterOffset);
+        try {
+            aFile.setLength(0);
+            aFile.write(beforeOffset);
+            aFile.write(afterOffset);
 
-        aFile.close();
+            aFile.close();
+
+            return "Successfully deleted " + numBytes + "bytes in file " + filePath;
+        } catch (IOException e) {
+            return "IOException";
+        }
         // do something with the data and clear/compact it.
 
         /*
@@ -107,7 +121,6 @@ public class HandleDeleteInFile {
          * outputStream.write(beforeOffset); outputStream.write(afterOffset);
          * outputStream.close();
          */
-        return "Successfully deleted " + numBytes + "bytes in file " + filePath;
     }
 
     public static byte[] createACK(int id, String status, String message) {
