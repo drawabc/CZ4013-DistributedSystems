@@ -30,7 +30,7 @@ public class ReadFile {
         return Utils.unwrapList(request);
     }
 
-    public static int handleResponse(byte[] response, Cache cache) {
+    public static Cache handleResponse(byte[] response) {
         int pointer = 0;
         String status = Utils.unmarshal(response, pointer, 1);
         pointer++;
@@ -43,22 +43,23 @@ public class ReadFile {
             String content = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
 
+            Cache cache = App.cacheMap.get(filePath);
             if (cache == null) {
                 cache = new Cache(filePath);
                 App.cacheMap.put(filePath, cache);
             }
             cache.updateCache(lastModified, content);
 
-            return 1;
+            return cache;
         } else if (status.equals("0")) {
             int length = Utils.unmarshal(response, pointer);
             pointer += Constants.INT_SIZE;
             String message = Utils.unmarshal(response, pointer, pointer + length);
             System.out.println(message);
-            return 0;
+            return null;
         } else {
             System.out.println("Error: failed to parse response");
-            return -1;
+            return null;
         }
     }
 

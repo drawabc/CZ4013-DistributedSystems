@@ -32,7 +32,7 @@ public class DeleteInFile {
         return Utils.unwrapList(request);
     }
 
-    public static void handleResponse(byte[] response, Cache cache) {
+    public static void handleResponse(byte[] response) {
         int pointer = 0;
         String status = Utils.unmarshal(response, pointer, 1);
         pointer++;
@@ -45,6 +45,7 @@ public class DeleteInFile {
             String content = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
 
+            Cache cache = App.cacheMap.get(filePath);
             if (cache == null) {
                 cache = new Cache(filePath);
                 App.cacheMap.put(filePath, cache);

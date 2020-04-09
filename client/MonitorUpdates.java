@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MonitorUpdates {
+    static String filePath;
+
     // Parameters: file pathname, monitor interval
     public static byte[] promptUser(Scanner sc, int id) {
         System.out.println("Enter file pathname:");
-        String filePath = sc.nextLine();
+        filePath = sc.nextLine();
 
         System.out.println("Enter monitor interval (in s):");
         int interval = Integer.parseInt(sc.nextLine()) * 1000;
@@ -57,17 +59,26 @@ public class MonitorUpdates {
         pointer++;
 
         if (status.equals("1")) {
+            long lastModified = Utils.unmarshalLong(response, pointer);
+            pointer += Constants.LONG_SIZE;
             int length = Utils.unmarshal(response, pointer);
             pointer += Constants.INT_SIZE;
-            String message = Utils.unmarshal(response, pointer, pointer + length);
+            String content = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
-            System.out.println(message);
+
+            Cache cache = App.cacheMap.get(filePath);
+            if (cache == null) {
+                cache = new Cache(filePath);
+                App.cacheMap.put(filePath, cache);
+            }
+            cache.updateCache(lastModified, content);
+
+            System.out.println("File updated!");
 
         } else if (status.equals("0")) {
             int length = Utils.unmarshal(response, pointer);
             pointer += Constants.INT_SIZE;
             String message = Utils.unmarshal(response, pointer, pointer + length);
-            pointer += length;
             System.out.println(message);
         } else {
             System.out.println("Error: failed to parse response");

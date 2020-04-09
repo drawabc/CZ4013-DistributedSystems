@@ -77,8 +77,8 @@ public class App {
                     if (cacheContent == null) {
                         b = ReadFile.constructRequest(udpclient.getID(), ReadFile.filePath);
                         response = udpclient.requestReply(b);
-                        if (ReadFile.handleResponse(response, cache) == 1) {
-                            cache = cacheMap.get(ReadFile.filePath);
+                        cache = ReadFile.handleResponse(response);
+                        if (cache != null) {
                             cacheContent = fetchCacheContent(cache, ReadFile.offset, ReadFile.numBytes);
                         } else
                             break;
@@ -89,7 +89,7 @@ public class App {
                     b = InsertToFile.promptUser(sc, udpclient.getID());
                     response = udpclient.requestReply(b);
                     cache = cacheMap.get(InsertToFile.filePath);
-                    InsertToFile.handleResponse(response, cache);
+                    InsertToFile.handleResponse(response);
                     break;
                 case 3:
                     b = MonitorUpdates.promptUser(sc, udpclient.getID());
@@ -119,7 +119,7 @@ public class App {
                     b = DeleteInFile.promptUser(sc, udpclient.getID());
                     response = udpclient.requestReply(b);
                     cache = cacheMap.get(DeleteInFile.filePath);
-                    DeleteInFile.handleResponse(response, cache);
+                    DeleteInFile.handleResponse(response);
                     break;
 
                 case 5:
@@ -129,8 +129,8 @@ public class App {
                     if (countedChars == -1) {
                         b = ReadFile.constructRequest(udpclient.getID(), CountChar.filePath);
                         response = udpclient.requestReply(b);
-                        if (ReadFile.handleResponse(response, cache) == 1) {
-                            cache = cacheMap.get(ReadFile.filePath);
+                        cache = ReadFile.handleResponse(response);
+                        if (cache != null) {
                             countedChars = fetchCacheChar(cache, CountChar.selectedChar);
                         } else
                             break;

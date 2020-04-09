@@ -25,7 +25,7 @@ public class LastModified {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
         pointer += Constants.INT_SIZE;
-        String filePath = Utils.unmarshal(message, pointer, pointer + length);
+        String filePath = Constants.FILEPATH + Utils.unmarshal(message, pointer, pointer + length);
         Long lastModified = fileTimestampMap.get(filePath);
         if (lastModified == null) {
             update(filePath);

@@ -3,21 +3,18 @@ package server;
 import client.Constants;
 
 import java.io.EOFException;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.RandomAccess;
 
 public class HandleDeleteInFile {
     public static void handleRequest(UDPServer server, byte[] message, InetAddress address, int port) {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
         pointer += Constants.INT_SIZE;
-        String filePath = Utils.unmarshal(message, pointer, pointer + length);
+        String filePath = Constants.FILEPATH + Utils.unmarshal(message, pointer, pointer + length);
         pointer += length;
 
         length = Utils.unmarshal(message, pointer);
@@ -31,30 +28,35 @@ public class HandleDeleteInFile {
 
         System.out.println(String.format("Delete in file: %s %d %d", filePath, offset, numBytes));
 
-        try {
-            // Update file modified timestamp
-            LastModified.update(filePath);
-
-            String fileContents = deleteInFile(filePath, offset, numBytes);
-            byte[] response = createACK(server.getID(), "1", LastModified.getTimestamp(filePath), fileContents);
-            server.send(response, Constants.DELETEINFILE_ID, address, port);
-
-            // Notify clients as the file has been updated
-            HandleMonitor.notify(server, Constants.FILEPATH + filePath, fileContents);
-        } catch (IOException e) {
-            System.out.println(e);
-            String errorMsg = "An error occured. Either the filename is incorrect or the offset exceeds the length";
+        String fileContent = deleteInFile(filePath, offset, numBytes);
+        String errorMsg;
+        if (fileContent.equals("FileNotFound")) {
+            errorMsg = "An error occured. The file " + filePath + " does not exist.";
             byte[] response = createNAK(server.getID(), "0", errorMsg);
             server.send(response, Constants.DELETEINFILE_ID, address, port);
-        }
+        } else if (fileContent.equals("IOException")) {
+            errorMsg = "An error occured. Maybe the offset is too large?";
+            byte[] response = createNAK(server.getID(), "0", errorMsg);
+            server.send(response, Constants.DELETEINFILE_ID, address, port);
+        } else {
+            LastModified.update(filePath);
 
+            byte[] response = createACK(server.getID(), "1", LastModified.getTimestamp(filePath), fileContent);
+            server.send(response, Constants.DELETEINFILE_ID, address, port);
+            HandleMonitor.notify(server, filePath);
+        }
     }
 
-    public static String deleteInFile(String filePath, int offset, int numBytes) throws IOException {
+    public static String deleteInFile(String filePath, int offset, int numBytes) {
         // TODO: check exception XD
         // Read file
-        filePath = Constants.FILEPATH + filePath;
-        RandomAccessFile aFile = new RandomAccessFile(filePath, "rw");
+
+        RandomAccessFile aFile;
+        try {
+            aFile = new RandomAccessFile(filePath, "rw");
+        } catch (FileNotFoundException e1) {
+            return "FileNotFound";
+        }
         /*
          * FileChannel inChannel = aFile.getChannel();
          * 
@@ -85,6 +87,8 @@ public class HandleDeleteInFile {
             }
         } catch (EOFException e) {
             System.out.println("File Length = " + x.size());
+        } catch (IOException e) {
+            return "IOException";
         }
 
         // seperate file before Offset
@@ -100,11 +104,17 @@ public class HandleDeleteInFile {
             afterOffset[j] = x.get(i);
             j++;
         }
-        aFile.setLength(0);
-        aFile.write(beforeOffset);
-        aFile.write(afterOffset);
+        try {
+            aFile.setLength(0);
+            aFile.write(beforeOffset);
+            aFile.write(afterOffset);
 
-        aFile.close();
+            aFile.close();
+
+            return new String(beforeOffset) + new String(afterOffset);
+        } catch (IOException e) {
+            return "IOException";
+        }
         // do something with the data and clear/compact it.
 
         /*
@@ -112,8 +122,6 @@ public class HandleDeleteInFile {
          * outputStream.write(beforeOffset); outputStream.write(afterOffset);
          * outputStream.close();
          */
-        return new String(beforeOffset) + new String(afterOffset);
-        // return "Successfully deleted " + numBytes + "bytes in file " + filePath;
     }
 
     public static byte[] createACK(int id, String status, long time, String message) {
