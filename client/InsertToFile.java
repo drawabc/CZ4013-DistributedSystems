@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class InsertToFile {
+    static String filePath;
+
     // Parameters: file pathname, offset (bytes), content to insert
-    public static void promptUser(Scanner sc) {
+    public static byte[] promptUser(Scanner sc, int id) {
         System.out.println("Enter file pathname:");
-        String filePath = sc.nextLine();
+        filePath = sc.nextLine();
 
         System.out.println("Enter character offset:");
         int offset = Integer.parseInt(sc.nextLine());
@@ -15,9 +17,7 @@ public class InsertToFile {
         System.out.println("Enter content to be inserted:");
         String content = sc.nextLine();
 
-        byte[] response = App.udpclient
-                .requestReply(constructRequest(App.udpclient.getID(), filePath, offset, content));
-        handleResponse(response, filePath);
+        return constructRequest(id, filePath, offset, content);
     }
 
     public static byte[] constructRequest(int id, String filePath, int offset, String content) {
@@ -32,7 +32,7 @@ public class InsertToFile {
         return Utils.unwrapList(request);
     }
 
-    public static void handleResponse(byte[] response, String filePath) {
+    public static void handleResponse(byte[] response, Cache cache) {
         int pointer = 0;
         String status = Utils.unmarshal(response, pointer, 1);
         pointer++;
@@ -45,7 +45,6 @@ public class InsertToFile {
             String content = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
 
-            Cache cache = App.cacheMap.get(filePath);
             if (cache == null) {
                 cache = new Cache(filePath);
                 App.cacheMap.put(filePath, cache);

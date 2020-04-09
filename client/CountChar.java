@@ -3,63 +3,54 @@ package client;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ReadFile {
+public class CountChar {
     static String filePath;
-    static int offset;
-    static int numBytes;
+    static char selectedChar;
 
     // Parameters: file pathname, offset (bytes), # of bytes to read
     public static void promptUser(Scanner sc) {
         System.out.println("Enter file pathname:");
         filePath = sc.nextLine();
 
-        System.out.println("Enter how many characters you want to skip:");
-        offset = Integer.parseInt(sc.nextLine());
+        System.out.println("Enter the character you want to count");
+        String s = sc.nextLine();
+        selectedChar = s.charAt(0);
 
-        System.out.println("How many characters you want to read:");
-        numBytes = Integer.parseInt(sc.nextLine());
+        // return constructRequest(id, filePath, selected);
     }
 
-    public static byte[] constructRequest(int id, String filePath) {
+    public static byte[] constructRequest(int id) {
         ArrayList<Byte> request = new ArrayList<Byte>();
 
+        String selected = Character.toString(selectedChar);
+
         Utils.appendMsg(request, id);
-        Utils.appendMsg(request, Constants.READFILE_ID);
+        Utils.appendMsg(request, Constants.COUNTCHAR_ID);
         Utils.appendMsgHeader(request, filePath);
+        Utils.appendMsgHeader(request, selected);
 
         return Utils.unwrapList(request);
     }
 
-    public static int handleResponse(byte[] response, Cache cache) {
+    public static void handleResponse(byte[] response) {
         int pointer = 0;
         String status = Utils.unmarshal(response, pointer, 1);
         pointer++;
 
         if (status.equals("1")) {
-            long lastModified = Utils.unmarshalLong(response, pointer);
-            pointer += Constants.LONG_SIZE;
             int length = Utils.unmarshal(response, pointer);
             pointer += Constants.INT_SIZE;
-            String content = Utils.unmarshal(response, pointer, pointer + length);
+            String message = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
-
-            if (cache == null) {
-                cache = new Cache(filePath);
-                App.cacheMap.put(filePath, cache);
-            }
-            cache.updateCache(lastModified, content);
-
-            return 1;
+            System.out.println(message);
         } else if (status.equals("0")) {
             int length = Utils.unmarshal(response, pointer);
             pointer += Constants.INT_SIZE;
             String message = Utils.unmarshal(response, pointer, pointer + length);
+            pointer += length;
             System.out.println(message);
-            return 0;
         } else {
             System.out.println("Error: failed to parse response");
-            return -1;
         }
     }
-
 }

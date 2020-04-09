@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class DeleteInFile {
+    static String filePath;
+
     // Parameters: file pathname, offset (bytes), # of bytes to delete
-    public static void promptUser(Scanner sc) {
+    public static byte[] promptUser(Scanner sc, int id) {
         System.out.println("Enter file pathname:");
-        String filePath = sc.nextLine();
+        filePath = sc.nextLine();
 
         System.out.println("Enter character offset:");
         int offset = Integer.parseInt(sc.nextLine());
@@ -15,9 +17,7 @@ public class DeleteInFile {
         System.out.println("How many characters you want to delete:");
         int numBytes = Integer.parseInt(sc.nextLine());
 
-        byte[] response = App.udpclient
-                .requestReply(constructRequest(App.udpclient.getID(), filePath, offset, numBytes));
-        handleResponse(response, filePath);
+        return constructRequest(id, filePath, offset, numBytes);
     }
 
     public static byte[] constructRequest(int id, String filePath, int offset, int numBytes) {
@@ -32,7 +32,7 @@ public class DeleteInFile {
         return Utils.unwrapList(request);
     }
 
-    public static void handleResponse(byte[] response, String filePath) {
+    public static void handleResponse(byte[] response, Cache cache) {
         int pointer = 0;
         String status = Utils.unmarshal(response, pointer, 1);
         pointer++;
@@ -45,7 +45,6 @@ public class DeleteInFile {
             String content = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
 
-            Cache cache = App.cacheMap.get(filePath);
             if (cache == null) {
                 cache = new Cache(filePath);
                 App.cacheMap.put(filePath, cache);
