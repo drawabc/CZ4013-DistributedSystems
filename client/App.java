@@ -48,6 +48,9 @@ public class App {
                                 MonitorUpdates.handleResponse(udpclient.receive());
                             } catch (SocketTimeoutException e) {
                                 System.out.println("Timeout reached.");
+                                b = MonitorUpdates.constructEndRequest(udpclient.getID());
+                                response = udpclient.requestReply(b);
+                                MonitorUpdates.handleResponse(response);
                                 udpclient.setTimeout(Constants.DEFAULT_TIMEOUT);
                                 break;
                             } catch (Exception e) {
