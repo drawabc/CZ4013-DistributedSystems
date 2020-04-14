@@ -5,6 +5,8 @@ import java.util.Scanner;
 
 public class MonitorUpdates {
     static String filePath;
+    static int interval;
+
 
     // Parameters: file pathname, monitor interval
     public static byte[] promptUser(Scanner sc, int id) {
@@ -12,16 +14,27 @@ public class MonitorUpdates {
         filePath = sc.nextLine();
 
         System.out.println("Enter monitor interval (in s):");
-        int interval = Integer.parseInt(sc.nextLine()) * 1000;
+        interval = Integer.parseInt(sc.nextLine()) * 1000;
 
-        return constructRequest(id, filePath, interval);
+        return constructRequest(id);
     }
 
-    public static byte[] constructRequest(int id, String filePath, int interval) {
+    public static byte[] constructRequest(int id) {
         ArrayList<Byte> request = new ArrayList<Byte>();
 
         Utils.appendMsg(request, id);
         Utils.appendMsg(request, Constants.MONITORFILE_ID);
+        Utils.appendMsgHeader(request, filePath);
+        Utils.appendMsgHeader(request, interval);
+
+        return Utils.unwrapList(request);
+    }
+
+    public static byte[] constructEndRequest(int id) {
+        ArrayList<Byte> request = new ArrayList<Byte>();
+
+        Utils.appendMsg(request, id);
+        Utils.appendMsg(request, Constants.MONITOREND_ID);
         Utils.appendMsgHeader(request, filePath);
         Utils.appendMsgHeader(request, interval);
 

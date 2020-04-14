@@ -49,31 +49,75 @@ public class HandleMonitor {
         }
     }
 
-    public static void notify(UDPServer server, String filePath) {
+    public static void handleEndRequest(UDPServer server, byte[] message, InetAddress address, int port) {
+        int pointer = 0;
+        int length = Utils.unmarshal(message, pointer);
+        pointer += Constants.INT_SIZE;
+        String filePath = Utils.unmarshal(message, pointer, pointer + length);
+        pointer += length;
+
+        length = Utils.unmarshal(message, pointer);
+        pointer += Constants.INT_SIZE;
+        int interval = Utils.unmarshal(message, pointer);
+
+        System.out.println(String.format("%s %d", filePath, interval));
+
+        String absfilePath = Constants.FILEPATH + filePath;
+        ArrayList<Watcher> watchers = map.get(absfilePath);
+        Watcher watcherDelete = null;
+        boolean watcherFound = false;
+
+        if (watchers == null || watchers.size() == 0) {
+            byte[] response = createACK(server.getID(), "0", "No clients are monitoring " + filePath);
+            server.send(response, Constants.MONITOREND_ID, address, port);
+            return;
+        }
+
+        for (Watcher watcher : watchers) {
+            watcherFound = watcher.getAddress().equals(address) && watcher.getPort() == port;
+            if (watcherFound) {
+                watcherDelete = watcher;
+                break;
+            }
+        }
+        if (watcherFound) {
+            System.out.println("Stop notifying: " + address.toString() + ":" + port);
+            watchers.remove(watcherDelete);
+            map.put(filePath, watchers);
+            byte[] response = createACK(server.getID(), "1", "");
+            server.send(response, Constants.MONITOREND_ID, address, port);
+        } else {
+            byte[] response = createACK(server.getID(), "0", "Client is not monitoring " + filePath);
+            server.send(response, Constants.MONITOREND_ID, address, port);
+        }
+
+    }
+
+    public static void notify(UDPServer server, String filePath, String content) {
         ArrayList<Watcher> watchers = map.get(filePath);
         if (watchers == null || watchers.size() == 0) {
             return;
         }
 
-        ArrayList<Watcher> unavailableWatchers = new ArrayList<Watcher>();
+        // ArrayList<Watcher> unavailableWatchers = new ArrayList<Watcher>();
 
         for (Watcher watcher : watchers) {
-            if (watcher.isAvailable()) {
-                System.out.println("Notifying: " + watcher.getAddress().toString() + ":" + watcher.getPort());
-                byte[] response = createACK(server.getID(), "1", LastModified.getTimestamp(filePath),
-                        HandleReadFile.readFile(filePath));
-                server.send(response, Constants.MONITORFILE_ID, watcher.getAddress(), watcher.getPort());
-            } else {
-                unavailableWatchers.add(watcher);
-            }
+            // if (watcher.isAvailable()) {
+            System.out.println("Notifying: " + watcher.getAddress().toString() + ":" + watcher.getPort());
+            byte[] response = createACK(server.getID(), "1", content);
+            server.send(response, Constants.MONITORFILE_ID, watcher.getAddress(), watcher.getPort());
+            // } else {
+            // unavailableWatchers.add(watcher);
+            // }
         }
 
-        for (Watcher watcher : unavailableWatchers) {
-            System.out.println("Stop notifying: " + watcher.getAddress().toString() + ":" + watcher.getPort());
-            watchers.remove(watcher);
-        }
+        // for (Watcher watcher : unavailableWatchers) {
+        // System.out.println("Stop notifying: " + watcher.getAddress().toString() + ":"
+        // + watcher.getPort());
+        // watchers.remove(watcher);
+        // }
 
-        map.put(filePath, watchers);
+        // map.put(filePath, watchers);
     }
 
     public static byte[] createACK(int id, String status, String message) {
