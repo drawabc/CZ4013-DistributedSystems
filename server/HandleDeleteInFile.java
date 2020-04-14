@@ -14,7 +14,7 @@ public class HandleDeleteInFile {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
         pointer += Constants.INT_SIZE;
-        String filePath = Utils.unmarshal(message, pointer, pointer + length);
+        String filePath = Constants.FILEPATH + Utils.unmarshal(message, pointer, pointer + length);
         pointer += length;
 
         length = Utils.unmarshal(message, pointer);
@@ -32,24 +32,25 @@ public class HandleDeleteInFile {
         String errorMsg;
         if (fileContent.equals("FileNotFound")) {
             errorMsg = "An error occured. The file " + filePath + " does not exist.";
-            byte[] response = createACK(server.getID(), "0", errorMsg);
+            byte[] response = createNAK(server.getID(), "0", errorMsg);
             server.send(response, Constants.DELETEINFILE_ID, address, port);
         } else if (fileContent.equals("IOException")) {
             errorMsg = "An error occured. Maybe the offset is too large?";
-            byte[] response = createACK(server.getID(), "0", errorMsg);
+            byte[] response = createNAK(server.getID(), "0", errorMsg);
             server.send(response, Constants.DELETEINFILE_ID, address, port);
         } else {
-            byte[] response = createACK(server.getID(), "1", fileContent);
+            LastModified.update(filePath);
+
+            byte[] response = createACK(server.getID(), "1", LastModified.getTimestamp(filePath), fileContent);
             server.send(response, Constants.DELETEINFILE_ID, address, port);
-            String notification = address.toString() + ":" + port + " editted " + filePath;
-            HandleMonitor.notify(server, Constants.FILEPATH + filePath, notification);
+            HandleMonitor.notify(server, filePath);
         }
     }
 
     public static String deleteInFile(String filePath, int offset, int numBytes) {
         // TODO: check exception XD
         // Read file
-        filePath = Constants.FILEPATH + filePath;
+
         RandomAccessFile aFile;
         try {
             aFile = new RandomAccessFile(filePath, "rw");
@@ -110,7 +111,7 @@ public class HandleDeleteInFile {
 
             aFile.close();
 
-            return "Successfully deleted " + numBytes + "bytes in file " + filePath;
+            return new String(beforeOffset) + new String(afterOffset);
         } catch (IOException e) {
             return "IOException";
         }
@@ -123,7 +124,18 @@ public class HandleDeleteInFile {
          */
     }
 
-    public static byte[] createACK(int id, String status, String message) {
+    public static byte[] createACK(int id, String status, long time, String message) {
+        ArrayList<Byte> response = new ArrayList<Byte>();
+
+        Utils.appendMsg(response, id);
+        Utils.appendMsg(response, status);
+        Utils.appendMsg(response, time);
+        Utils.appendMsgHeader(response, message);
+
+        return Utils.unwrapList(response);
+    }
+
+    public static byte[] createNAK(int id, String status, String message) {
         ArrayList<Byte> response = new ArrayList<Byte>();
 
         Utils.appendMsg(response, id);

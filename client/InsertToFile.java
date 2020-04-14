@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class InsertToFile {
+    static String filePath;
+
     // Parameters: file pathname, offset (bytes), content to insert
     public static byte[] promptUser(Scanner sc, int id) {
         System.out.println("Enter file pathname:");
-        String filePath = sc.nextLine();
+        filePath = sc.nextLine();
 
         System.out.println("Enter character offset:");
         int offset = Integer.parseInt(sc.nextLine());
@@ -36,11 +38,23 @@ public class InsertToFile {
         pointer++;
 
         if (status.equals("1")) {
+            long lastModified = Utils.unmarshalLong(response, pointer);
+            pointer += Constants.LONG_SIZE;
             int length = Utils.unmarshal(response, pointer);
             pointer += Constants.INT_SIZE;
-            String message = Utils.unmarshal(response, pointer, pointer + length);
+            String content = Utils.unmarshal(response, pointer, pointer + length);
             pointer += length;
-            System.out.println(message);
+
+            Cache cache = App.cacheMap.get(filePath);
+            if (cache == null) {
+                cache = new Cache(filePath);
+                App.cacheMap.put(filePath, cache);
+            }
+            cache.updateCache(lastModified, content);
+
+            System.out.println("Successfully editted file! New file contents:");
+            System.out.println(cache.getFileContent());
+
         } else if (status.equals("0")) {
             int length = Utils.unmarshal(response, pointer);
             pointer += Constants.INT_SIZE;

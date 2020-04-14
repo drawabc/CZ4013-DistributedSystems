@@ -39,12 +39,14 @@ public class UDPServer {
             HandleMonitor.handleEndRequest(this, data, address, port);
         } else if (serviceID == Constants.DELETEINFILE_ID) {
             HandleDeleteInFile.handleRequest(this, data, address, port);
+        } else if (serviceID == Constants.CHECKCACHE_ID) {
+            LastModified.handleRequest(this, data, address, port);
         } else if (serviceID == Constants.COUNTCHAR_ID) {
             HandleCountChar.handleRequest(this, data, address, port);
         } else {
             System.out.println("Error: serviceID is invalid.");
             String errorMsg = "Requested service is invalid.";
-            byte[] response = HandleReadFile.createACK(this.getID(), "0", errorMsg);
+            byte[] response = HandleInsertToFile.createNAK(this.getID(), "0", errorMsg);
             this.send(response, 2, address, port);
         }
     }

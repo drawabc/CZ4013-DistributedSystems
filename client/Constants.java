@@ -8,6 +8,7 @@ public class Constants {
     public static final int AT_MOST_ONCE = 1;
     public static final int DEFAULT_SEMANTIC_INVOCATION = AT_LEAST_ONCE;
     public static final int DEFAULT_TIMEOUT = 2000;
+    public static long REFRESH_INTERVAL;
 
     public static final int READFILE_ID = 1;
     public static final int INSERTTOFILE_ID = 2;

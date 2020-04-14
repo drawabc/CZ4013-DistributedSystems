@@ -3,23 +3,26 @@ package client;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static java.lang.Byte.parseByte;
-
 public class CountChar {
+    static String filePath;
+    static char selectedChar;
+
     // Parameters: file pathname, offset (bytes), # of bytes to read
-    public static byte[] promptUser(Scanner sc, int id) {
+    public static void promptUser(Scanner sc) {
         System.out.println("Enter file pathname:");
-        String filePath = sc.nextLine();
+        filePath = sc.nextLine();
 
         System.out.println("Enter the character you want to count");
         String s = sc.nextLine();
-        String selected = Character.toString(s.charAt(0));
+        selectedChar = s.charAt(0);
 
-        return constructRequest(id, filePath, selected);
+        // return constructRequest(id, filePath, selected);
     }
 
-    public static byte[] constructRequest(int id, String filePath, String selected) {
+    public static byte[] constructRequest(int id) {
         ArrayList<Byte> request = new ArrayList<Byte>();
+
+        String selected = Character.toString(selectedChar);
 
         Utils.appendMsg(request, id);
         Utils.appendMsg(request, Constants.COUNTCHAR_ID);

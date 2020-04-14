@@ -129,4 +129,15 @@ public class HandleMonitor {
 
         return Utils.unwrapList(response);
     }
+
+    public static byte[] createACK(int id, String status, long time, String message) {
+        ArrayList<Byte> response = new ArrayList<Byte>();
+
+        Utils.appendMsg(response, id);
+        Utils.appendMsg(response, status);
+        Utils.appendMsg(response, time);
+        Utils.appendMsgHeader(response, message);
+
+        return Utils.unwrapList(response);
+    }
 }

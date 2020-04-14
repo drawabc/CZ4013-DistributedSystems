@@ -15,39 +15,27 @@ public class HandleReadFile {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
         pointer += Constants.INT_SIZE;
-        String filePath = Utils.unmarshal(message, pointer, pointer + length);
-        pointer += length;
+        String filePath = Constants.FILEPATH + Utils.unmarshal(message, pointer, pointer + length);
+        System.out.println("Read file: " + filePath);
 
-        length = Utils.unmarshal(message, pointer);
-        pointer += Constants.INT_SIZE;
-        int offset = Utils.unmarshal(message, pointer);
-        pointer += length;
-
-        length = Utils.unmarshal(message, pointer);
-        pointer += Constants.INT_SIZE;
-        int numBytes = Utils.unmarshal(message, pointer);
-
-        System.out.println(String.format("Read file: %s %d %d", filePath, offset, numBytes));
-
-        String fileContent = readFile(filePath, offset, numBytes);
+        String fileContent = readFile(filePath);
         String errorMsg;
         if (fileContent.equals("FileNotFound")) {
             errorMsg = "An error occured. The file " + filePath + " does not exist.";
-            byte[] response = createACK(server.getID(), "0", errorMsg);
+            byte[] response = createNAK(server.getID(), "0", errorMsg);
             server.send(response, Constants.READFILE_ID, address, port);
         } else if (fileContent.equals("IOException")) {
             errorMsg = "An error occured. Maybe the offset is too large?";
-            byte[] response = createACK(server.getID(), "0", errorMsg);
+            byte[] response = createNAK(server.getID(), "0", errorMsg);
             server.send(response, Constants.READFILE_ID, address, port);
         } else {
-            byte[] response = createACK(server.getID(), "1", fileContent);
+            byte[] response = createACK(server.getID(), "1", LastModified.getTimestamp(filePath), fileContent);
             server.send(response, Constants.READFILE_ID, address, port);
         }
     }
 
-    public static String readFile(String filePath, int offset, int numBytes) {
+    public static String readFile(String filePath) {
         // TODO: CHECK ALL TEST CASES
-        filePath = Constants.FILEPATH + filePath;
         RandomAccessFile aFile;
         try {
             aFile = new RandomAccessFile(filePath, "r");
@@ -57,8 +45,7 @@ public class HandleReadFile {
         FileChannel inChannel = aFile.getChannel();
         MappedByteBuffer buffer;
         try {
-            buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, offset,
-                    Math.min(inChannel.size() - offset, numBytes));
+            buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
             byte[] b = new byte[buffer.remaining()];
             buffer.get(b);
 
@@ -72,7 +59,18 @@ public class HandleReadFile {
         }
     }
 
-    public static byte[] createACK(int id, String status, String message) {
+    public static byte[] createACK(int id, String status, long time, String message) {
+        ArrayList<Byte> response = new ArrayList<Byte>();
+
+        Utils.appendMsg(response, id);
+        Utils.appendMsg(response, status);
+        Utils.appendMsg(response, time);
+        Utils.appendMsgHeader(response, message);
+
+        return Utils.unwrapList(response);
+    }
+
+    public static byte[] createNAK(int id, String status, String message) {
         ArrayList<Byte> response = new ArrayList<Byte>();
 
         Utils.appendMsg(response, id);

@@ -15,7 +15,7 @@ public class HandleInsertToFile {
         int pointer = 0;
         int length = Utils.unmarshal(message, pointer);
         pointer += Constants.INT_SIZE;
-        String filePath = Utils.unmarshal(message, pointer, pointer + length);
+        String filePath = Constants.FILEPATH + Utils.unmarshal(message, pointer, pointer + length);
         pointer += length;
 
         length = Utils.unmarshal(message, pointer);
@@ -33,23 +33,23 @@ public class HandleInsertToFile {
         String errorMsg;
         if (fileContent.equals("FileNotFound")) {
             errorMsg = "An error occured. The file " + filePath + " does not exist.";
-            byte[] response = createACK(server.getID(), "0", errorMsg);
+            byte[] response = createNAK(server.getID(), "0", errorMsg);
             server.send(response, Constants.INSERTTOFILE_ID, address, port);
         } else if (fileContent.equals("IOException")) {
             errorMsg = "An error occured. Maybe the offset is too large?";
-            byte[] response = createACK(server.getID(), "0", errorMsg);
+            byte[] response = createNAK(server.getID(), "0", errorMsg);
             server.send(response, Constants.INSERTTOFILE_ID, address, port);
         } else {
-            byte[] response = createACK(server.getID(), "1", fileContent);
+            LastModified.update(filePath);
+
+            byte[] response = createACK(server.getID(), "1", LastModified.getTimestamp(filePath), fileContent);
             server.send(response, Constants.INSERTTOFILE_ID, address, port);
-            String notification = address.toString() + ":" + port + " editted " + filePath;
-            HandleMonitor.notify(server, Constants.FILEPATH + filePath, notification);
+            HandleMonitor.notify(server, filePath);
         }
     }
 
     public static String insertToFile(String filePath, int offset, String content) {
         // Read file
-        filePath = Constants.FILEPATH + filePath;
         RandomAccessFile aFile;
         try {
             aFile = new RandomAccessFile(filePath, "rw");
@@ -93,14 +93,26 @@ public class HandleInsertToFile {
             inChannel.close();
             aFile.close();
 
-            return "Successfully inserted to file " + filePath;
+            return new String(beforeOffset) + content + new String(afterOffset);
         } catch (IOException e) {
             return "IOException";
         }
 
+        // return "Successfully inserted to file " + filePath;
     }
 
-    public static byte[] createACK(int id, String status, String message) {
+    public static byte[] createACK(int id, String status, long time, String message) {
+        ArrayList<Byte> response = new ArrayList<Byte>();
+
+        Utils.appendMsg(response, id);
+        Utils.appendMsg(response, status);
+        Utils.appendMsg(response, time);
+        Utils.appendMsgHeader(response, message);
+
+        return Utils.unwrapList(response);
+    }
+
+    public static byte[] createNAK(int id, String status, String message) {
         ArrayList<Byte> response = new ArrayList<Byte>();
 
         Utils.appendMsg(response, id);

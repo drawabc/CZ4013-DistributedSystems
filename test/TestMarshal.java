@@ -1,5 +1,6 @@
 package test;
 
+import java.time.Clock;
 import java.util.Scanner;
 
 import client.Utils;
@@ -7,7 +8,7 @@ import client.Utils;
 public class TestMarshal {
     public static void main(String args[]) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Data Type: (1) Int\t(2) String");
+        System.out.println("Data Type: (1) Int\t(2) String\t(3) Long");
         int dataType = Integer.parseInt(sc.nextLine());
 
         if (dataType == 1) {
@@ -24,6 +25,16 @@ public class TestMarshal {
             String unmarshalledString = Utils.unmarshal(marshalledString, 0, s.length());
             System.out.println(marshalledString);
             System.out.println(unmarshalledString);
+        } else if (dataType == 3) {
+            Clock clock = Clock.systemDefaultZone();
+            long l = clock.millis();
+            System.out.println("Clock 1 millis: " + l);
+            int i = (int) l;
+            System.out.println("Clock 1 millis: " + i);
+            byte[] marshalledLong = Utils.marshalLong(l);
+            Long unmarshalledLong = Utils.unmarshalLong(marshalledLong, 0);
+            System.out.println(marshalledLong);
+            System.out.println(unmarshalledLong);
         }
 
         sc.close();
