@@ -48,7 +48,7 @@ public class UDPClient {
 
     public byte[] send(byte[] buf) throws IOException {
         byte[] header = Utils.marshal(buf.length);
-        DatagramPacket packet = new DatagramPacket(header, header.length, address, 8899);
+            DatagramPacket packet = new DatagramPacket(header, header.length, address, 8899);
 
         // Send packet header
         socket.send(packet);
