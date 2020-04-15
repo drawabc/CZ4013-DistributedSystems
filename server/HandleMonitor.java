@@ -1,7 +1,5 @@
 package server;
 
-import client.Constants;
-
 import java.io.File;
 import java.net.InetAddress;
 import java.time.Clock;
@@ -93,7 +91,7 @@ public class HandleMonitor {
 
     }
 
-    public static void notify(UDPServer server, String filePath, String content) {
+    public static void notify(UDPServer server, String filePath) {
         ArrayList<Watcher> watchers = map.get(filePath);
         if (watchers == null || watchers.size() == 0) {
             return;
@@ -104,7 +102,8 @@ public class HandleMonitor {
         for (Watcher watcher : watchers) {
             // if (watcher.isAvailable()) {
             System.out.println("Notifying: " + watcher.getAddress().toString() + ":" + watcher.getPort());
-            byte[] response = createACK(server.getID(), "1", content);
+            byte[] response = createACK(server.getID(), "1", LastModified.getTimestamp(filePath),
+                    HandleReadFile.readFile(filePath));
             server.send(response, Constants.MONITORFILE_ID, watcher.getAddress(), watcher.getPort());
             // } else {
             // unavailableWatchers.add(watcher);
