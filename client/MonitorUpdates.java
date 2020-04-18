@@ -70,8 +70,12 @@ public class MonitorUpdates {
 
     public static void handleResponse(byte[] response) {
         int pointer = 0;
-        String status = Utils.unmarshal(response, pointer, 1);
-        pointer++;
+        String status = "null";
+        if (response!=null){
+            status = Utils.unmarshal(response, pointer, 1);
+            pointer++;
+        }
+
 
         if (status.equals("1")) {
             long lastModified = Utils.unmarshalLong(response, pointer);
