@@ -100,4 +100,36 @@ public class MonitorUpdates {
             System.out.println("Error: failed to parse response");
         }
     }
+
+    public static int handleEndResponse(byte[] response) {
+        int pointer = 0;
+        String status = "null";
+        if (response!=null){
+            status = Utils.unmarshal(response, pointer, 1);
+            pointer++;
+            return 0;
+        }
+
+        if (status.equals("1")) {
+            try{
+                int length = Utils.unmarshal(response, pointer);
+                pointer += Constants.INT_SIZE;
+                String message = Utils.unmarshal(response, pointer, pointer + length);
+                if (message.equals("Confirm")){
+                    return 1;
+                }
+                System.out.println("End Monitoring Confirmed");
+            } catch (Exception e){
+                return 0;
+            }
+        } else if (status.equals("0")) {
+            int length = Utils.unmarshal(response, pointer);
+            pointer += Constants.INT_SIZE;
+            String message = Utils.unmarshal(response, pointer, pointer + length);
+            System.out.println(message);
+        } else {
+            System.out.println("Error: failed to parse response");
+        }
+        return 0;
+    }
 }

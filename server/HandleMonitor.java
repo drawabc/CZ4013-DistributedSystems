@@ -82,7 +82,7 @@ public class HandleMonitor {
             System.out.println("Stop notifying: " + address.toString() + ":" + port);
             watchers.remove(watcherDelete);
             map.put(filePath, watchers);
-            byte[] response = createACK(server.getID(), "1", "");
+            byte[] response = createACK(server.getID(), "1", "Confirm");
             server.send(response, Constants.MONITOREND_ID, address, port);
         } else {
             byte[] response = createACK(server.getID(), "0", "Client is not monitoring " + filePath);
