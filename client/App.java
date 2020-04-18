@@ -111,7 +111,13 @@ public class App {
                         }
                         udpclient.setTimeout(Constants.DEFAULT_TIMEOUT);
                         b = MonitorUpdates.constructEndRequest(udpclient.getID());
-                        response = udpclient.requestReply(b);
+                        int status = 0;
+                        while(status!=1){
+                            response = udpclient.requestReply(b);
+                            status = MonitorUpdates.handleEndResponse(response);
+                        }
+
+
                         // MonitorUpdates.handleResponse(response);
 
                         // break;
