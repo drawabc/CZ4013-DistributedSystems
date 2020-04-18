@@ -3,6 +3,7 @@ package client;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class App {
     static HashMap<String, Cache> cacheMap = new HashMap<String, Cache>();
@@ -95,10 +96,11 @@ public class App {
                     b = MonitorUpdates.promptUser(sc, udpclient.getID());
                     try {
                         response = udpclient.requestReply(b);
+                        if (response == null) break;
                         Long duration = MonitorUpdates.getDuration(response);
                         System.out.println("Monitoring for " + duration / 1000 + " s");
                         MonitorUpdates.startMonitoring();
-                        udpclient.setTimeout(1);
+                        udpclient.setTimeout(10);
                         while (MonitorUpdates.isAvailable()) {
                             try {
                                 MonitorUpdates.handleResponse(udpclient.receive());
@@ -113,11 +115,13 @@ public class App {
                         b = MonitorUpdates.constructEndRequest(udpclient.getID());
                         int status = 0;
                         while(status!=1){
+                            System.out.println("Try End Monitoring");
                             response = udpclient.requestReply(b);
                             status = MonitorUpdates.handleEndResponse(response);
+                            TimeUnit.MILLISECONDS.sleep(1000);
+                            if (status==1) break;
                         }
-
-
+                        System.out.println("Monitoring ended");
                         // MonitorUpdates.handleResponse(response);
 
                         // break;

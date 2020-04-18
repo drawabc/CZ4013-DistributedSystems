@@ -109,17 +109,15 @@ public class MonitorUpdates {
         if (response != null) {
             status = Utils.unmarshal(response, pointer, 1);
             pointer++;
-            return 0;
         }
         if (status.equals("1")) {
             try {
                 int length = Utils.unmarshal(response, pointer);
                 pointer += Constants.INT_SIZE;
                 String message = Utils.unmarshal(response, pointer, pointer + length);
-                if (message.equals("Confirm")) {
+                if (message.equals("Ok")) {
                     return 1;
                 }
-                System.out.println("End Monitoring Confirmed");
             } catch (Exception e) {
                 return 0;
             }
@@ -127,9 +125,8 @@ public class MonitorUpdates {
             int length = Utils.unmarshal(response, pointer);
             pointer += Constants.INT_SIZE;
             String message = Utils.unmarshal(response, pointer, pointer + length);
-            System.out.println(message);
         } else {
-            System.out.println("Error: failed to parse response");
+            // do nothing
         }
         return 0;
     }
