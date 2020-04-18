@@ -1,12 +1,14 @@
 package client;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MonitorUpdates {
     static String filePath;
     static int interval;
-
+    static long start;
+    static Clock clock = Clock.systemDefaultZone();
 
     // Parameters: file pathname, monitor interval
     public static byte[] promptUser(Scanner sc, int id) {
@@ -96,5 +98,17 @@ public class MonitorUpdates {
         } else {
             System.out.println("Error: failed to parse response");
         }
+    }
+
+    static void startMonitoring() {
+        start = clock.millis();
+    }
+
+    static long getDuration() {
+        return clock.millis() - start;
+    }
+
+    static boolean isAvailable() {
+        return getDuration() < interval;
     }
 }

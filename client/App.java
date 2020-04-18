@@ -97,21 +97,24 @@ public class App {
                         response = udpclient.requestReply(b);
                         Long duration = MonitorUpdates.getDuration(response);
                         System.out.println("Monitoring for " + duration / 1000 + " s");
-                        udpclient.setTimeout(duration.intValue());
-                        while (true) {
+                        MonitorUpdates.startMonitoring();
+                        udpclient.setTimeout(1);
+                        while (MonitorUpdates.isAvailable()) {
                             try {
                                 MonitorUpdates.handleResponse(udpclient.receive());
                             } catch (SocketTimeoutException e) {
-                                System.out.println("Timeout reached.");
-                                b = MonitorUpdates.constructEndRequest(udpclient.getID());
-                                response = udpclient.requestReply(b);
-                                MonitorUpdates.handleResponse(response);
-                                udpclient.setTimeout(Constants.DEFAULT_TIMEOUT);
-                                break;
+                                // System.out.println("Timeout reached.");
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
+                        udpclient.setTimeout(Constants.DEFAULT_TIMEOUT);
+                        b = MonitorUpdates.constructEndRequest(udpclient.getID());
+                        response = udpclient.requestReply(b);
+                        // MonitorUpdates.handleResponse(response);
+
+                        // break;
                     } catch (Exception e) {
                         System.out.println("");
                         e.printStackTrace();
