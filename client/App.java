@@ -112,10 +112,12 @@ public class App {
                                 e.printStackTrace();
                             }
                         }
+                        udpclient.setTimeout(Constants.DEFAULT_TIMEOUT);
                     } catch (Exception e) {
                         System.out.println("");
                         e.printStackTrace();
                     }
+
 
                     break;
                 case 4:
