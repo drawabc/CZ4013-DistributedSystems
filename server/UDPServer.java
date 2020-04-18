@@ -1,7 +1,5 @@
 package server;
 
-import client.Constants; //TODO: need to make Server's own constants
-
 import java.net.*;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +16,7 @@ public class UDPServer {
         resID = 0;
         clientHistory = new HashMap<String, byte[]>();
         try {
-            socket = new DatagramSocket(8899);
+            socket = new DatagramSocket(Constants.DEFAULT_PORT);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,16 +108,6 @@ public class UDPServer {
                             request.getData().length);
                     handleClientRequest(serviceID, requestContent, request.getAddress(), request.getPort());
                 }
-
-                // DatagramPacket reply = new DatagramPacket(response, response.length,
-                // request.getAddress(),
-                // request.getPort());
-
-                // // Send packet header that contains the content size
-                // byte[] header = Utils.marshal(response.length);
-                // socket.send(new DatagramPacket(header, header.length, request.getAddress(),
-                // request.getPort()));
-                // socket.send(reply);
             }
 
         } catch (Exception e) {

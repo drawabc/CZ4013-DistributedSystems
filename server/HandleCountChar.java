@@ -1,7 +1,5 @@
 package server;
 
-import client.Constants;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;

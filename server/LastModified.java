@@ -5,8 +5,6 @@ import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import client.Constants;
-
 public class LastModified {
     static HashMap<String, Long> fileTimestampMap = new HashMap<String, Long>();
 
