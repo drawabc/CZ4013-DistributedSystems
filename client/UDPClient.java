@@ -47,7 +47,7 @@ public class UDPClient {
     }
 
     public byte[] send(byte[] buf) throws IOException {
-        if (Math.random() >= Constants.PACKET_LOSS_RATE){
+        if (Math.random() > Constants.PACKET_LOSS_RATE){
             System.out.println("Packet Lost, Send Failed");
             return null;
         }

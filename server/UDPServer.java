@@ -63,7 +63,7 @@ public class UDPServer {
     public void send(byte[] response, int requestID, InetAddress address, int port) {
         String fullAddress = address.toString() + "|" + port;
         updateHistory(fullAddress, this.curReqID, response);
-        if (Math.random() >= Constants.PACKET_LOSS_RATE){
+        if (Math.random() > Constants.PACKET_LOSS_RATE){
             System.out.println("Packet Lost, Send Failed");
             return;
         }

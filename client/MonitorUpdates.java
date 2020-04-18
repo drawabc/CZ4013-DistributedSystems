@@ -74,7 +74,6 @@ public class MonitorUpdates {
             pointer++;
         }
 
-
         if (status.equals("1")) {
             long lastModified = Utils.unmarshalLong(response, pointer);
             pointer += Constants.LONG_SIZE;
