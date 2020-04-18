@@ -12,6 +12,7 @@ public class UDPServer {
     private HashMap<String, byte[]> clientHistory;
     private int resID;
     public int semInv;
+    private int curReqID;
 
     public UDPServer() {
         resID = 0;
@@ -51,9 +52,9 @@ public class UDPServer {
         }
     }
 
-    // TODO: replace History
     public byte[] checkHistory(String address, int requestID) {
         String hashKey = address + "|" + requestID;
+        System.out.println(clientHistory);
         return clientHistory.get(hashKey);
     }
 
@@ -63,13 +64,17 @@ public class UDPServer {
     }
 
     public void send(byte[] response, int requestID, InetAddress address, int port) {
+        String fullAddress = address.toString() + ":" + port;
+        updateHistory(fullAddress, this.curReqID, response);
+        if (Math.random() >= Constants.PACKET_LOSS_RATE){
+            System.out.println("Packet Lost, Send Failed");
+            return;
+        }
         try {
             if (socket != null) {
                 byte[] header = Utils.marshal(response.length);
                 socket.send(new DatagramPacket(header, header.length, address, port));
                 socket.send(new DatagramPacket(response, response.length, address, port));
-                String fullAddress = address.toString() + "|" + port;
-                updateHistory(fullAddress, requestID, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,9 +97,10 @@ public class UDPServer {
                 String fullAddress = request.getAddress().toString() + ":" + request.getPort();
                 int requestID = Utils.unmarshal(request.getData(), 0);
                 System.out.println("Got request from " + fullAddress + " with ID: " + requestID);
-
                 byte[] response = checkHistory(fullAddress, requestID);
+                this.curReqID = requestID;
                 if (response != null && this.semInv == Constants.AT_MOST_ONCE) {
+                    System.out.println("Using at most once semantics, sending from history");
                     int serviceID = Utils.unmarshal(request.getData(), Constants.INT_SIZE);
                     byte[] requestContent = response;
                     this.send(response, serviceID, request.getAddress(), request.getPort());
