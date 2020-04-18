@@ -47,6 +47,10 @@ public class UDPClient {
     }
 
     public byte[] send(byte[] buf) throws IOException {
+        if (Math.random() >= Constants.PACKET_LOSS_RATE){
+            System.out.println("Packet Lost, Send Failed");
+            return null;
+        }
         byte[] header = Utils.marshal(buf.length);
             DatagramPacket packet = new DatagramPacket(header, header.length, address, 8899);
 
@@ -82,6 +86,7 @@ public class UDPClient {
      */
     public byte[] requestReply(byte[] buf) {
         byte[] reply = new byte[0];
+        reply = null;
         int timeoutCount = 0;
         do {
             try {
