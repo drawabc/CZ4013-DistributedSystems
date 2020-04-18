@@ -1,12 +1,14 @@
 package client;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MonitorUpdates {
     static String filePath;
     static int interval;
-
+    static long start;
+    static Clock clock = Clock.systemDefaultZone();
 
     // Parameters: file pathname, monitor interval
     public static byte[] promptUser(Scanner sc, int id) {
@@ -104,22 +106,21 @@ public class MonitorUpdates {
     public static int handleEndResponse(byte[] response) {
         int pointer = 0;
         String status = "null";
-        if (response!=null){
+        if (response != null) {
             status = Utils.unmarshal(response, pointer, 1);
             pointer++;
             return 0;
         }
-
         if (status.equals("1")) {
-            try{
+            try {
                 int length = Utils.unmarshal(response, pointer);
                 pointer += Constants.INT_SIZE;
                 String message = Utils.unmarshal(response, pointer, pointer + length);
-                if (message.equals("Confirm")){
+                if (message.equals("Confirm")) {
                     return 1;
                 }
                 System.out.println("End Monitoring Confirmed");
-            } catch (Exception e){
+            } catch (Exception e) {
                 return 0;
             }
         } else if (status.equals("0")) {
@@ -131,5 +132,17 @@ public class MonitorUpdates {
             System.out.println("Error: failed to parse response");
         }
         return 0;
+    }
+
+    static void startMonitoring() {
+        start = clock.millis();
+    }
+
+    static long getDuration() {
+        return clock.millis() - start;
+    }
+
+    static boolean isAvailable() {
+        return getDuration() < interval;
     }
 }
