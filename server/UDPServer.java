@@ -91,7 +91,7 @@ public class UDPServer {
                 request = new DatagramPacket(buffer, buffer.length);
                 socket.receive(request);
 
-                String fullAddress = request.getAddress().toString() + ":" + request.getPort();
+                String fullAddress = request.getAddress().toString() + "|" + request.getPort();
                 int requestID = Utils.unmarshal(request.getData(), 0);
                 System.out.println("Got request from " + fullAddress + " with ID: " + requestID);
                 byte[] response = checkHistory(fullAddress, requestID);

@@ -33,7 +33,6 @@ public class HandleReadFile {
     }
 
     public static String readFile(String filePath) {
-        // TODO: CHECK ALL TEST CASES
         RandomAccessFile aFile;
         try {
             aFile = new RandomAccessFile(filePath, "r");

@@ -14,7 +14,6 @@ public class TestFileHandling {
          * try { System.out.println(new String(HandleReadFile.readFile("data.txt", 0,
          * 1000))); } catch (Exception e) { System.out.print(e); }
          */
-        // TODO: change file path to src/main/server/data + filePath in all functions
         try {
             HandleCountChar.countChar("data.txt", 'u');
         } catch (Exception e) {
