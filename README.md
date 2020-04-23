@@ -26,3 +26,9 @@ java server.UDPServer
 ```
 
 The `txt` files must be put in `server/data` directory.
+
+### Change Invocation Semantics
+Modify Constants.java DEFAULT_SEMANTIC_INVOCATION = AT_MOST_ONCE or AT_LEAST_ONCE
+
+### Change Packet Loss Rate
+Modify Constants.java PACKET_LOSS_RATE (1.0 means no loss, 0.0 means always loss)
