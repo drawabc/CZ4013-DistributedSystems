@@ -46,7 +46,6 @@ public class HandleDeleteInFile {
     }
 
     public static String deleteInFile(String filePath, int offset, int numBytes) {
-        // TODO: check exception XD
         // Read file
 
         RandomAccessFile aFile;
