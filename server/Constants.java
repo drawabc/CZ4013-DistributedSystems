@@ -8,7 +8,7 @@ public class Constants {
     public static final int DEFAULT_SEMANTIC_INVOCATION = AT_MOST_ONCE;
     public static final int DEFAULT_TIMEOUT = 2000;
     public static long REFRESH_INTERVAL;
-    public static final double PACKET_LOSS_RATE = 0.3;
+    public static final double PACKET_LOSS_RATE = 1.0;
 
     public static final int READFILE_ID = 1;
     public static final int INSERTTOFILE_ID = 2;
