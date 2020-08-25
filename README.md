@@ -1,4 +1,4 @@
-# CZ4013-DistributedSystems
+# DistributedSystems
 
 This project implements a client-server distributed system which allows sharing and modifying a text (.txt) file stored in the server remotely through distributed clients. This project also implements UDP transport protocol for client-server communication.
 
